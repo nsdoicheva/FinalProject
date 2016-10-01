@@ -108,7 +108,7 @@ public class TransactionDAO {
 			try {
 				connection.rollback();
 			} catch (SQLException e1) {
-				System.out.println("Tuka da hvurlq nov exception");
+				System.out.println("The rollback wasn't successful!");
 			}
 			
 		}
@@ -131,7 +131,6 @@ public class TransactionDAO {
 			return transactions;
 
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return transactions;
@@ -153,10 +152,8 @@ public class TransactionDAO {
 						resultSet.getString("receiver"), resultSet.getString("description")));
 			}
 
-		} catch (SQLException e) {
-			System.out.println("User cannot be logged right now.");
-		} catch (FailedConnectionException e) {
-			System.out.println("No connection");
+		} catch (SQLException | FailedConnectionException e) {
+			System.out.println("Transactions can't be listed!");		
 		}
 		return myTransactions;
 
