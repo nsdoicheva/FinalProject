@@ -59,8 +59,8 @@ public class TransactionDAO {
 			connection = DBConnection.getInstance().getConnection();
 			connection.setAutoCommit(false);
 		    
-			int fromAccountID = getAccountID(from.decryptIban(from.getIBAN()), connection);
-			int toAccountID = getAccountID(to.decryptIban(to.getIBAN()), connection);
+			int fromAccountID = getAccountID(Account.decryptIban(from.getIBAN()), connection);
+			int toAccountID = getAccountID(Account.decryptIban(to.getIBAN()), connection);
         
 			PreparedStatement statement = DBConnection.getInstance().getConnection()
 					.prepareStatement(INSERT_TRANSACTION, Statement.RETURN_GENERATED_KEYS);
@@ -86,17 +86,20 @@ public class TransactionDAO {
 			updateStatement.setDouble(1, newSumFrom);
 			updateStatement.setInt(2, fromAccountID);
 			int countUpdatesInFrom = updateStatement.executeUpdate();
-			
+						
 			PreparedStatement updateStatement2 = connection.prepareStatement("UPDATE accounts SET sum = ? where id = ?;");
 			updateStatement2.setDouble(1, newSumTo);
 			updateStatement2.setInt(2, toAccountID);
 			int countUpdatesInTo=updateStatement2.executeUpdate();
+			
+			if(countUpdatesInFrom > 0 && countUpdatesInTo > 0) {
+				System.out.println("The account's sums were updated");
+			}
 
 			connection.commit();
 			connection.setAutoCommit(true);
 			if (count > 0) {
-				System.out.println("New transaction was made");
-				
+				System.out.println("New transaction was made");				
 				return true;
 			}      
             
