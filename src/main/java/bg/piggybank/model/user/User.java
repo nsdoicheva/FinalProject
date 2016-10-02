@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class User extends ContactInfo {
+public class User extends ContactInfo implements Comparable<User>{
 	private static final int MIN_PASSWORD_LENGTH = 6;
 	private String name;
 	private String password;
@@ -107,6 +107,11 @@ public class User extends ContactInfo {
 	public String toString() {
 		return "User [name=" + name + ", username=" + username + ", id=" + id + ", EGN=" + EGN + ", citizenship="
 				+ citizenship + "]";
+	}
+
+	@Override
+	public int compareTo(User user) {
+		return this.getName().compareTo(user.getName());
 	}
 
 }
