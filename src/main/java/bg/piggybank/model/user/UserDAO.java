@@ -7,9 +7,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import bg.piggybank.model.DBConnection;
 import bg.piggybank.model.exeptions.*;
@@ -22,14 +22,12 @@ public class UserDAO {
 	private static final String INSERT_USER_QUERY = "INSERT INTO users VALUES(null, ?, md5(?), ?, ?, ?, ?, ?, ?);";
 	private static final String SELECT_CITY_QUERY = "SELECT id FROM cities WHERE name= ? ;";
 	private static final String SELECT_COUNTRY_QUERY = "SELECT id FROM countries WHERE name= ? ;";
-	private static final String SELECT_ALL_INFO_FOR_USERS = "SELECT id, username, password, name, egn, email, phoneNum, citizenship, adress_id FROM users";
-	private static final String SELECT_COUNTRY_BY_ID = "SELECT c.name FROM countries c WHERE id=?;";
-	private static final String SELECT_CITY_BY_ID = "SELECT c.name FROM cities c WHERE id=?;";
+	private static final String SELECT_ALL_INFO_FOR_USERS = "SELECT id, username, password, name, egn, email, phoneNum, citizenship, adress_id FROM users ORDER BY id";
+	private static final String SELECT_COUNTRY_BY_ID = "SELECT c.name FROM countries c join cities cit ON c.id=cit.country_id WHERE cit.id=?;";
+	private static final String SELECT_CITY_BY_ID = "SELECT c.name FROM cities c JOIN adresses a ON a.city_id= c.id WHERE a.id=? ;";
 	private static final String SELECT_ADDRESS_BY_ID = "SELECT street FROM adresses WHERE id=?;";
 	private static UserDAO instance;
 	private static List<User> users = Collections.synchronizedList(new ArrayList<User>());
-	private static List<String> cities = Collections.synchronizedList(new ArrayList<String>());
-	private static List<String> countries = Collections.synchronizedList(new ArrayList<String>());
 
 	private UserDAO() {
 
@@ -60,14 +58,9 @@ public class UserDAO {
 					addressId = saveAddress(connection, address, cityId);
 				}
 			} else {
-				if (cityId > 0) {
-					countryId = saveCountry(connection, country);
-					addressId = saveAddress(connection, address, cityId);
-				} else {
-					countryId = saveCountry(connection, country);
-					cityId = saveCity(connection, city, countryId);
-					addressId = saveAddress(connection, address, cityId);
-				}
+				countryId = saveCountry(connection, country);
+				cityId = saveCity(connection, city, countryId);
+				addressId = saveAddress(connection, address, cityId);
 			}
 			if (addressId == 0) {
 				System.out.println("Address wasnt added to DB");
@@ -84,7 +77,7 @@ public class UserDAO {
 	}
 
 	public Set<User> getAllUsersFromDB() {
-		Set<User> users = new HashSet<User>();
+		Set<User> users = new TreeSet<User>();
 		try {
 			Statement statement = DBConnection.getInstance().getConnection().createStatement();
 			ResultSet resultSet = statement.executeQuery(SELECT_ALL_INFO_FOR_USERS);
@@ -104,15 +97,13 @@ public class UserDAO {
 					System.out.println("User wasn't added to the set.");
 					e.printStackTrace();
 				}
-				return users;
 			}
+			return users;
 		} catch (SQLException | FailedConnectionException e) {
 			System.out.println("Cannot make statement!");
 			e.printStackTrace();
 			return users;
-
 		}
-		return users;
 	}
 
 	public int saveUser(User user) {
@@ -353,8 +344,6 @@ public class UserDAO {
 		res.next();
 		int addressId = res.getInt(1);
 		statement.close();
-		connection.commit();
 		return addressId;
 	}
 }
-
