@@ -10,12 +10,15 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.stereotype.Component;
+
 import bg.piggybank.model.DBConnection;
 import bg.piggybank.model.accounts.Account;
 import bg.piggybank.model.exeptions.FailedConnectionException;
 import bg.piggybank.model.exeptions.NotEnoughMoneyException;
 import bg.piggybank.model.user.User;
 
+@Component
 public class TransactionDAO {
 	private final static String SELECT_ALL_TRANSACTIONS = "SELECT t.sum , u.username as sender, us.username as receiver, t.description "
 			+ "FROM transactions t join accounts a on t.fromAccount_id = a.id join accounts ac on t.toAccount_id = ac.id "
@@ -27,18 +30,7 @@ public class TransactionDAO {
 	private final static String INSERT_TRANSACTION = "INSERT INTO transactions VALUES (null, ?, ?, ?, ?, ?);";
 	private final static String SELECT_ACCOUNT_ID = "select id from accounts where IBAN = ? ;";
 
-	private static TransactionDAO instance;
 	private static List<Transaction> transactions = Collections.synchronizedList(new ArrayList<Transaction>());
-
-	private TransactionDAO() {
-	}
-
-	public synchronized static TransactionDAO getInstance() {
-		if (instance == null) {
-			instance = new TransactionDAO();
-		}
-		return instance;
-	}
 
 	public int getAccountID(String iban, Connection connection) throws SQLException {
 		PreparedStatement ps = connection.prepareStatement(SELECT_ACCOUNT_ID);
@@ -55,8 +47,8 @@ public class TransactionDAO {
 			connection = DBConnection.getInstance().getConnection();
 			connection.setAutoCommit(false);
 
-			int fromAccountID = getAccountID(from.decryptIban(from.getIBAN()), connection);
-			int toAccountID = getAccountID(to.decryptIban(to.getIBAN()), connection);
+			int fromAccountID = getAccountID(Account.decryptIban(from.getIBAN()), connection);
+			int toAccountID = getAccountID(Account.decryptIban(to.getIBAN()), connection);
 
 			PreparedStatement statement = DBConnection.getInstance().getConnection()
 					.prepareStatement(INSERT_TRANSACTION, Statement.RETURN_GENERATED_KEYS);
