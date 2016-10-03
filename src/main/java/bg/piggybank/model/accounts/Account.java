@@ -1,6 +1,7 @@
 package bg.piggybank.model.accounts;
 
 import java.security.Key;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -9,19 +10,24 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.iban4j.*;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
 
 import bg.piggybank.model.exeptions.*;
 import bg.piggybank.model.BasicInfo;
+import bg.piggybank.model.configurations.DAOConfig;
 
+@ContextConfiguration(classes= DAOConfig.class)
 public class Account extends BasicInfo {
 	private String name;
 	private String IBAN;
 	private AccountType type;
 	private CurrencyType currency;
 	private List<Card> cards = new ArrayList<Card>();
+	@Autowired
+	private AccountDAO accountDAO;
 
-	public Account(String name, String IBAN, AccountType type, CurrencyType currency, double sum) {
+	public Account(String name, AccountType type, CurrencyType currency, double sum) {
 		super(sum);
 		try {
 			if (isValidString(name)) {
@@ -29,7 +35,6 @@ public class Account extends BasicInfo {
 			} else {
 				throw new InvalidAccountInfoException("Invalid name");
 			}
-//		
 			if (isValidType(type)) {
 				this.type = type;
 			} else {
@@ -45,6 +50,11 @@ public class Account extends BasicInfo {
 		} catch (InvalidAccountInfoException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public Account(String name, String IBAN, AccountType type, CurrencyType currency, double sum) {
+		this(name, type, currency, sum);
+		this.IBAN=IBAN;
 	}
 
 	public List<Card> getCards() {
@@ -116,8 +126,6 @@ public class Account extends BasicInfo {
 
 			// the encrypted String
 			enc = sb.toString();
-			// System.out.println("encrypted:" + enc);
-
 		} catch (Exception e) {
 			System.out.println("problem");
 		}
@@ -163,7 +171,9 @@ public class Account extends BasicInfo {
 	}
 	
 	void setIBAN(){
-		Integer number= 11000064 + AccountDAO.getNumberOfAccounts() ;
+		Integer numberOfAccounts=  AccountDAO.getNumberOfAccounts();
+		Integer number= 11000064 + numberOfAccounts ;
+		System.out.println(number);
 		String accountNumber= number.toString();
 		Iban iban= new Iban.Builder().countryCode(CountryCode.BG).bankCode("BNBG").branchCode("4545").accountType("20").accountNumber(accountNumber).build() ;
 		this.IBAN = iban.toString();
