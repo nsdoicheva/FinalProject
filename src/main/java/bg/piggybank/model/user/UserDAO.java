@@ -11,9 +11,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import bg.piggybank.model.DBConnection;
 import bg.piggybank.model.exeptions.*;
 
+@Component
 public class UserDAO {
 
 	private static final String INSERT_INTO_COUNTRIES = "INSERT INTO countries VALUES(null,?);";
@@ -26,19 +30,8 @@ public class UserDAO {
 	private static final String SELECT_COUNTRY_BY_ID = "SELECT c.name FROM countries c join cities cit ON c.id=cit.country_id WHERE cit.id=?;";
 	private static final String SELECT_CITY_BY_ID = "SELECT c.name FROM cities c JOIN adresses a ON a.city_id= c.id WHERE a.id=? ;";
 	private static final String SELECT_ADDRESS_BY_ID = "SELECT street FROM adresses WHERE id=?;";
-	private static UserDAO instance;
 	private static List<User> users = Collections.synchronizedList(new ArrayList<User>());
 
-	private UserDAO() {
-
-	}
-
-	public synchronized static UserDAO getInstance() {
-		if (instance == null) {
-			instance = new UserDAO();
-		}
-		return instance;
-	}
 
 	public int saveUserAddress(String address, String city, String country) {
 		int id = 0;
