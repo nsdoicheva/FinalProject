@@ -11,24 +11,6 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 public class ContactAdmin {
-
-	private String senderName;
-	private String email;
-	private String description;
-	
-	
-	public void setSenderName(String senderName) {
-		this.senderName = senderName;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
 	
 	public void sendEmail(String senderName, String email, String description) {
 
