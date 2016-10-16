@@ -18,6 +18,11 @@ public class User extends ContactInfo implements Comparable<User>{
 	private String citizenship;
 	private List<Account> accounts = new ArrayList<Account>();
 
+	public User() {
+		super();
+	}
+	
+	
 	public User(String name, String password, String username, String address, String city, String country,
 			String phoneNum, String email, String EGN, String citizenship) throws IncorrectContactInfoException {
 		super(address, city, country, phoneNum, email);
@@ -83,7 +88,7 @@ public class User extends ContactInfo implements Comparable<User>{
 		return username;
 	}
 
-	protected String getPassword() {
+	public String getPassword() {
 		return this.password;
 	}
 

@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import bg.piggybank.model.DBConnection;
@@ -19,7 +18,8 @@ import bg.piggybank.model.exeptions.*;
 
 @Component
 public class UserDAO {
-
+	
+	private static final String CAPITAL_LETTER = "A";
 	private static final String INSERT_INTO_COUNTRIES = "INSERT INTO countries VALUES(null,?);";
 	private static final String INSERT_INTO_CITIES = "INSERT INTO cities VALUES(null,?,?);";
 	private static final String INSERT_INTO_ADRESSES = "INSERT INTO adresses VALUES(null, ?, ?);";
@@ -30,14 +30,16 @@ public class UserDAO {
 	private static final String SELECT_COUNTRY_BY_ID = "SELECT c.name FROM countries c join cities cit ON c.id=cit.country_id WHERE cit.id=?;";
 	private static final String SELECT_CITY_BY_ID = "SELECT c.name FROM cities c JOIN adresses a ON a.city_id= c.id WHERE a.id=? ;";
 	private static final String SELECT_ADDRESS_BY_ID = "SELECT street FROM adresses WHERE id=?;";
+	private static final String SELECT_USER_SQL = "SELECT username, password FROM users WHERE username = ? AND password = md5(?)";
+	private static final String SELECT_USER_BY_USERNAME = "SELECT id, password, name, egn, email, phoneNum, citizenship, adress_id FROM users WHERE username= ?;";
 	private static List<User> users = Collections.synchronizedList(new ArrayList<User>());
 
 
 	public int saveUserAddress(String address, String city, String country) {
 		int id = 0;
+		Connection connection =null;
 		try {
-			Connection connection = DBConnection.getInstance().getConnection();
-			connection.setAutoCommit(false);
+			connection = DBConnection.getInstance().getConnection();
 			int cityId = 0;
 			int countryId = 0;
 			int addressId = 0;
@@ -60,15 +62,42 @@ public class UserDAO {
 				connection.rollback();
 			} else {
 				connection.commit();
-				connection.setAutoCommit(true);
 				return addressId;
 			}
 		} catch (Exception e) {
+			try {
+				connection.rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
 			e.printStackTrace();
 		}
 		return id;
 	}
 
+	public boolean loginUser(String username, String password) {
+		Connection connection = null;
+		try {
+			connection = DBConnection.getInstance().getConnection();
+			PreparedStatement ps = connection.prepareStatement(SELECT_USER_SQL);
+			ps.setString(1, username);
+			ps.setString(2, password);
+
+			ResultSet rs = ps.executeQuery();
+			if (rs.next() == false) {
+				System.out.println("Wrong username or password.");
+				return false;
+			}
+			ps.close();
+		} catch (SQLException e) {
+			System.out.println("User cannot be logged right now.");
+		} catch (FailedConnectionException e) {
+			System.out.println("No connection");
+		}
+		return true;
+	}
+	
+	
 	public Set<User> getAllUsersFromDB() {
 		Set<User> users = new TreeSet<User>();
 		try {
@@ -91,6 +120,7 @@ public class UserDAO {
 					e.printStackTrace();
 				}
 			}
+			statement.close();
 			return users;
 		} catch (SQLException | FailedConnectionException e) {
 			System.out.println("Cannot make statement!");
@@ -102,8 +132,10 @@ public class UserDAO {
 	public int saveUser(User user) {
 		int userId = 0;
 		if (!users.contains(user)) {
+			Connection connection =null;
 			try {
-				Connection connection = DBConnection.getInstance().getConnection();
+				connection = DBConnection.getInstance().getConnection();
+				connection.setAutoCommit(false);
 				int addressId = saveUserAddress(user.getAddress(), user.getCity(), user.getCountry());
 				System.out.println(addressId);
 				if (addressId != 0) {
@@ -121,6 +153,7 @@ public class UserDAO {
 					if (count2 > 0) {
 						System.out.println("The user was saved to the DB");
 					} else {
+						connection.rollback();
 						System.out.println("The user wasn't saved to the DB");
 					}
 
@@ -130,6 +163,7 @@ public class UserDAO {
 					statement.close();
 					user.setId(userId);
 					users.add(user);
+					connection.commit();
 				} else {
 					System.out.println("User wasn't inserted");
 					throw new FailedInsertException("User wasn't inserted into DB");
@@ -141,6 +175,17 @@ public class UserDAO {
 				e.printStackTrace();
 			} catch (FailedInsertException e) {
 				System.out.println("Nothing was inserted");
+				try {
+					connection.rollback();
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+			}finally{
+				try {
+					connection.setAutoCommit(true);
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
 			}
 		} else {
 			System.out.println("User is already in the DB");
@@ -338,5 +383,53 @@ public class UserDAO {
 		int addressId = res.getInt(1);
 		statement.close();
 		return addressId;
+	}
+	
+	public User getUserByUsername(String username) {
+		User user = null;
+		Connection connection = null;
+		try {
+			connection = DBConnection.getInstance().getConnection();
+			connection.setAutoCommit(false);
+			PreparedStatement statement = connection.prepareStatement(SELECT_USER_BY_USERNAME);
+			statement.setString(1, username);
+			ResultSet result = statement.executeQuery();
+			if (result.next()) {
+				String name = result.getString("name");
+				String password = result.getString("password")+CAPITAL_LETTER;
+				String EGN = result.getString("EGN");
+				String email = result.getString("email");
+				String phoneNum = result.getString("phoneNum");
+				String citizenship = result.getString("citizenship");
+				String address = getAddressById(result.getInt("adress_id"));
+				String city = getCityByAddressID(result.getInt("adress_id"));
+				String country = getCountryByCityID(getCityId(city));
+				user = new User(name, password, username, address, city, country, phoneNum, email, EGN, citizenship);
+				user.setId(result.getInt("id"));
+				statement.close();
+				connection.commit();
+				return user;
+			} else {
+				System.out.println("Country doesn't exist.");
+				connection.rollback();
+				return user;
+			}
+		} catch (Exception e) {
+			System.out.println("Country connection\\query problem.");
+			try {
+				connection.rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+			e.printStackTrace();
+			return user;
+		}finally{
+			try {
+				connection.setAutoCommit(true);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+
 	}
 }
