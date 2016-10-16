@@ -10,26 +10,30 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import bg.piggybank.model.DBConnection;
 import bg.piggybank.model.accounts.Account;
-import bg.piggybank.model.accounts.AccountType;
-import bg.piggybank.model.accounts.CurrencyType;
+import bg.piggybank.model.accounts.AccountDAO;
 import bg.piggybank.model.exeptions.FailedConnectionException;
 import bg.piggybank.model.exeptions.InvalidTransactionInfoException;
 import bg.piggybank.model.exeptions.NotEnoughMoneyException;
-import bg.piggybank.model.user.User;
 
 @Component
 public class TransactionDAO {
+	@Autowired
+	private AccountDAO accountDao;
 	private final static String SELECT_ALL_TRANSACTIONS = "SELECT t.sum , u.username as sender, us.username as receiver, t.description "
 			+ "FROM transactions t join accounts a on t.fromAccount_id = a.id join accounts ac on t.toAccount_id = ac.id "
 			+ "JOIN users u ON u.id=a.users_id JOIN users us ON us.id=ac.users_id ; ";
 
-	private final static String SELECT_ALL_USER_TRANSACTIONS = "SELECT t.sum , u.username as sender, us.username as receiver, t.description "
+	private final static String SELECT_ALL_USER_TRANSACTIONS = "SELECT t.sum , u.username as sender, us.username as receiver, t.description, t.fromAccount_id, t.toAccount_id "
 			+ "FROM transactions t join accounts a on t.fromAccount_id = a.id join accounts ac on t.toAccount_id = ac.id "
 			+ "JOIN users u ON u.id=a.users_id JOIN users us ON us.id=ac.users_id WHERE u.username= ? OR us.username=?; ";
+	private final static String SELECT_ALL_ACCOUNT_TRANSACTIONS = "SELECT t.sum , u.username as sender, us.username as receiver, t.description, t.fromAccount_id, t.toAccount_id "
+			+ "FROM transactions t join accounts a on t.fromAccount_id = a.id join accounts ac on t.toAccount_id = ac.id "
+			+ "JOIN users u ON u.id=a.users_id JOIN users us ON us.id=ac.users_id WHERE t.fromAccount_id =? OR t.toAccount_id=?; ";
 	private final static String INSERT_TRANSACTION = "INSERT INTO transactions VALUES (null, ?, ?, ?, ?, ?);";
 	private final static String SELECT_ACCOUNT_ID = "select id from accounts where IBAN = ? ;";
 
@@ -76,13 +80,13 @@ public class TransactionDAO {
 						.prepareStatement("UPDATE accounts SET sum = ? where id = ?;");
 				updateStatement.setDouble(1, newSumFrom);
 				updateStatement.setInt(2, fromAccountID);
-				int countUpdatesInFrom = updateStatement.executeUpdate();
+				updateStatement.executeUpdate();
 
 				PreparedStatement updateStatement2 = connection
 						.prepareStatement("UPDATE accounts SET sum = ? where id = ?;");
 				updateStatement2.setDouble(1, newSumTo);
 				updateStatement2.setInt(2, toAccountID);
-				int countUpdatesInTo = updateStatement2.executeUpdate();
+				updateStatement2.executeUpdate();
 
 				connection.commit();
 				if (count > 0) {
@@ -102,7 +106,7 @@ public class TransactionDAO {
 				System.out.println("Tuka da hvurlq nov exception");
 			}
 
-		}finally{
+		} finally {
 			try {
 				connection.setAutoCommit(true);
 			} catch (SQLException e) {
@@ -143,12 +147,18 @@ public class TransactionDAO {
 			ResultSet resultSet = ps.executeQuery();
 
 			while (resultSet.next()) {
-				myTransactions.add(new Transaction(resultSet.getInt("sum"), resultSet.getString("sender"),
-						resultSet.getString("receiver"), resultSet.getString("description")));
+				Transaction transaction = new Transaction(resultSet.getInt("sum"), resultSet.getString("sender"),
+						resultSet.getString("receiver"), resultSet.getString("description"));
+				Account from = accountDao.getAccountByID(resultSet.getInt("fromAccount_id"), connection);
+				Account to = accountDao.getAccountByID(resultSet.getInt("toAccount_id"), connection);
+				transaction.setFromIBAN(from.getIBAN());
+				transaction.setToIBAN(to.getIBAN());
+				myTransactions.add(transaction);
 			}
 
 		} catch (SQLException e) {
-			System.out.println("User cannot be logged right now.");
+			System.out.println("Transaction problem");
+			e.printStackTrace();
 		} catch (FailedConnectionException e) {
 			System.out.println("No connection");
 		}
@@ -164,6 +174,37 @@ public class TransactionDAO {
 		} else {
 			return false;
 		}
+	}
+
+	public List<Transaction> listAllTransactionsForAccount(String IBAN) {
+		Account account = accountDao.getAccountByIBAN(IBAN);
+		List<Transaction> myTransactions = new ArrayList<Transaction>();
+		try {
+			Connection connection = DBConnection.getInstance().getConnection();
+			PreparedStatement ps = connection.prepareStatement(SELECT_ALL_ACCOUNT_TRANSACTIONS);
+			ps.setInt(1, account.getId());
+			ps.setInt(2, account.getId());
+
+			ResultSet resultSet = ps.executeQuery();
+
+			while (resultSet.next()) {
+				Transaction transaction = new Transaction(resultSet.getInt("sum"), resultSet.getString("sender"),
+						resultSet.getString("receiver"), resultSet.getString("description"));
+				Account from = accountDao.getAccountByID(resultSet.getInt("fromAccount_id"), connection);
+				Account to = accountDao.getAccountByID(resultSet.getInt("toAccount_id"), connection);
+				transaction.setFromIBAN(from.getIBAN());
+				transaction.setToIBAN(to.getIBAN());
+				myTransactions.add(transaction);
+			}
+
+		} catch (SQLException e) {
+			System.out.println("Transaction problem.");
+			e.printStackTrace();
+		} catch (FailedConnectionException e) {
+			System.out.println("No connection");
+		}
+		return myTransactions;
+
 	}
 
 }

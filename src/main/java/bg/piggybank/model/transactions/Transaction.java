@@ -1,13 +1,14 @@
 package bg.piggybank.model.transactions;
 
 import bg.piggybank.model.*;
-import bg.piggybank.model.accounts.Account;
 import bg.piggybank.model.exeptions.*;
 
 public class Transaction extends BasicInfo {
 	private String sender; //username
 	private String receiver;
 	private String description;
+	private String fromIBAN;
+	private String toIBAN;
 
 	public Transaction(double sum, String sender, String receiver, String description) {
 		super(sum);
@@ -57,5 +58,26 @@ public class Transaction extends BasicInfo {
 
 	public String getDescription() {
 		return description;
+	}
+	
+
+	public String getFromIBAN() {
+		return fromIBAN;
+	}
+
+	public void setFromIBAN(String IBAN) {
+		if(isValidInfo(IBAN)){
+		this.fromIBAN = IBAN;
+		}
+	}
+	
+	public String getToIBAN() {
+		return toIBAN;
+	}
+
+	public void setToIBAN(String IBAN) {
+		if(isValidInfo(IBAN)){
+		this.toIBAN = IBAN;
+		}
 	}
 }
