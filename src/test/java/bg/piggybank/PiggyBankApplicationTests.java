@@ -1,6 +1,7 @@
 package bg.piggybank;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,8 +16,11 @@ import bg.piggybank.model.accounts.AccountType;
 import bg.piggybank.model.accounts.CurrencyType;
 import bg.piggybank.model.amounts.AmountDAO;
 import bg.piggybank.model.amounts.AmountSaver;
+import bg.piggybank.model.cards.Card;
+import bg.piggybank.model.cards.CardDAO;
 import bg.piggybank.model.configurations.Config;
 import bg.piggybank.model.exeptions.AccountException;
+import bg.piggybank.model.exeptions.CardException;
 import bg.piggybank.model.exeptions.FailedConnectionException;
 import bg.piggybank.model.exeptions.IncorrectContactInfoException;
 import bg.piggybank.model.exeptions.UserInfoException;
@@ -38,6 +42,8 @@ public class PiggyBankApplicationTests {
 	private TransactionDAO transactionDAO;
 	@Autowired
 	private AmountDAO amountDAO;
+	@Autowired
+	private CardDAO cardDAO;
 	
 	/*@Test
 	public void testUserDao() throws IncorrectContactInfoException{
@@ -98,8 +104,35 @@ public class PiggyBankApplicationTests {
 		amountSaver.run();
 	}*/
 	
-	@Test
+	/*@Test
 	public void testSaverAfterServerStop(){
 		amountDAO.startAmountTrackingAfterServerRestart();
+	}*/
+	
+	/*@Test
+	public void getAllMyAmounts(){
+		System.out.println(amountDAO.getAllAmountsForAccount("BG34BNBG45452011000073"));
+		
+	}*/
+	
+	/*@Test
+	public void getAllMyTransactions(){
+		//System.out.println(transactionDAO.listAllMyTransacions("ivan123"));
+		String iban=Account.decryptIban("ﾮ￣ﾅ(ￆﾻ-	ￂ84nﾨￜ1Ll<R1LDﾦ￡ysF");
+		System.out.println(iban);
+		System.out.println(transactionDAO.listAllTransactionsForAccount(iban));
+	}*/
+	
+	@Test
+	public void getAllMyCards(){
+		try {
+			List<Card> cards= cardDAO.getAllCardsForUser("ivan123");
+			for(Card card: cards){
+				System.out.println(card.getNumber());
+				System.out.println(card.getType());
+			}
+		} catch (CardException | AccountException e) {
+			e.printStackTrace();
+		}
 	}
   }
