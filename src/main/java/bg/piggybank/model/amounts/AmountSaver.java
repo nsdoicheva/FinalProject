@@ -5,14 +5,10 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Calendar;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.test.context.ContextConfiguration;
 
 import bg.piggybank.model.DBConnection;
 import bg.piggybank.model.accounts.Account;
 import bg.piggybank.model.accounts.AccountDAO;
-import bg.piggybank.model.configurations.Config;
 import bg.piggybank.model.exeptions.FailedConnectionException;
 import bg.piggybank.model.exeptions.InvalidAccountException;
 
@@ -46,7 +42,7 @@ public class AmountSaver implements Runnable {
 			try {
 				connection = DBConnection.getInstance().getConnection();
 				try {
-					Thread.sleep(1000*60*60*24);
+					Thread.sleep(6000);
 				} catch (InterruptedException e) {
 					return;
 				}
