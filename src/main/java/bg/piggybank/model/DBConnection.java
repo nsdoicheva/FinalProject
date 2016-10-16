@@ -21,7 +21,7 @@ public class DBConnection {
 			this.connection = 
 					DriverManager.getConnection("jdbc:mysql://localhost:3306/bank", DB_USER, DB_PASSWORD);
 		} catch (Exception e) {
-			System.out.println("TUKA E PROBLEMA");
+			System.out.println("Connection problem");
 		}
 	}
 	
