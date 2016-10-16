@@ -1,6 +1,5 @@
 package bg.piggybank.controler;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,12 +17,10 @@ import bg.piggybank.model.accounts.AccountType;
 import bg.piggybank.model.accounts.CurrencyType;
 import bg.piggybank.model.amounts.AmountSaver;
 import bg.piggybank.model.exeptions.AccountException;
-import bg.piggybank.model.exeptions.FailedConnectionException;
 import bg.piggybank.model.exeptions.IncorrectContactInfoException;
 import bg.piggybank.model.exeptions.InvalidAccountException;
 import bg.piggybank.model.exeptions.InvalidAccountInfoException;
 import bg.piggybank.model.exeptions.UserInfoException;
-import bg.piggybank.model.transactions.Transaction;
 import bg.piggybank.model.user.User;
 import bg.piggybank.model.user.UserDAO;
 
@@ -67,6 +64,10 @@ public class AccountController {
 		CurrencyType currency = accountDao.getCurrencyType(request.getParameter("currency"));
 		AccountType type = accountDao.getAccountType(request.getParameter("type"));
 		double sum = Double.parseDouble(request.getParameter("sum"));
+		if(sum<=0){
+			request.setAttribute("errorMessage", "Сумата в сметката не може да е 0 или по-малко.");
+			return show(request, response);
+		}
 		Account account = new Account(nameOfAccount, type, currency, sum);
 		try {
 			accountDao.registrateUserAccount(user, account);

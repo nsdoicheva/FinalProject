@@ -1,27 +1,47 @@
 package bg.piggybank.controler;
 
-import java.util.ArrayList;
-import java.util.List;
+
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import bg.piggybank.model.accounts.Account;
+import bg.piggybank.model.ContactAdmin;
 
 @Controller
 public class ContactController {
 
 	@RequestMapping(value = "/contact", method = RequestMethod.GET)
-	public String show(HttpServletRequest request, HttpServletResponse response) {
+	public String showContacts(Model model){
 		return "contact";
 	}
 	
+	
+	@RequestMapping(value = "/contact", method = RequestMethod.POST)
+	public String receiveMessage(HttpServletRequest request, HttpServletRequest response) {
+		String senderName = request.getParameter("name");
+		String email = request.getParameter("email");
+		String description = request.getParameter("text");
+		new ContactAdmin().sendEmail(senderName, email, description);
+		return "contact";
+		
+	}
+	
 	@RequestMapping(value = "/contactLogged", method = RequestMethod.GET)
-	public String showLogged(HttpServletRequest request, HttpServletResponse response) {
+	public String showContactLogged(Model model){
 		return "contactLogged";
+	}
+	
+	@RequestMapping(value = "/contactLogged", method = RequestMethod.POST)
+	public String receiveMessageLogged(HttpServletRequest request, HttpServletRequest response) {
+		String senderName = request.getParameter("name");
+		String email = request.getParameter("email");
+		String description = request.getParameter("text");
+		new ContactAdmin().sendEmail(senderName, email, description);
+		return "contactLogged";
+		
 	}
 }

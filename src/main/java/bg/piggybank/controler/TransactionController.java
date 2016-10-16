@@ -23,7 +23,7 @@ import bg.piggybank.model.transactions.TransactionDAO;
 public class TransactionController {
 
 	@Autowired
-	private TransactionDAO dao;
+	private TransactionDAO transactionDao;
 
 	@Autowired
 	private AccountDAO accountDao;
@@ -31,12 +31,59 @@ public class TransactionController {
 	@RequestMapping(value = "/transactions", method = RequestMethod.GET)
 	public String showTransactions(HttpServletRequest request, HttpServletResponse response)
 			throws IncorrectContactInfoException {
+		List<Account> accounts = new ArrayList<Account>();
+		if (request.getSession(false) != null) {
+			accounts = accountDao.getAllMyAccounts((String) request.getSession(false).getAttribute("username"));
+			request.setAttribute("myAccounts", accounts);
+			return "transactions";
+		} else {
+			return "index";
+		}
+	}
+
+	@RequestMapping(value = "/transactions", method = RequestMethod.POST)
+	public String getAmounts(HttpServletRequest request, HttpServletResponse response) {
+
+		if (request.getSession(false) != null) {
+			String account = request.getParameter("fromIban");
+			request.getSession(false).setAttribute("account", account);
+			return showTransaction(request, response);
+		} else {
+			return "index";
+		}
+	}
+
+	@RequestMapping(value = "/myTransactions", method = RequestMethod.GET)
+	public String showTransaction(HttpServletRequest request, HttpServletResponse response) {
 		List<Transaction> transactions = new ArrayList<Transaction>();
-		if(request.getSession(false)!=null){
-		transactions = dao.listAllMyTransacions((String) request.getSession(false).getAttribute("username"));
-		request.setAttribute("transactions", transactions);
-		return "transactions";
-		}else{
+		List<Account> accounts = new ArrayList<Account>();
+		if (request.getSession(false) != null) {
+			accounts = accountDao.getAllMyAccounts((String) request.getSession(false).getAttribute("username"));
+			request.setAttribute("myAccounts", accounts);
+			if (request.getParameter("fromIban").equals("Всички")) {
+				transactions = transactionDao
+						.listAllMyTransacions((String) request.getSession(false).getAttribute("username"));
+				request.setAttribute("transactions", transactions);
+			} else {
+				String account = (String) request.getSession(false).getAttribute("account");
+				System.out.println(account);
+				transactions = transactionDao.listAllTransactionsForAccount(account);
+				request.setAttribute("transactions", transactions);
+			}
+			return "myTransactions";
+		} else {
+			return "index";
+		}
+	}
+
+	@RequestMapping(value = "/myTransactions", method = RequestMethod.POST)
+	public String getMyAmounts(HttpServletRequest request, HttpServletResponse response) {
+
+		if (request.getSession(false) != null) {
+			String account = request.getParameter("fromIban");
+			request.getSession(false).setAttribute("account", account);
+			return showTransaction(request, response);
+		} else {
 			return "index";
 		}
 	}
@@ -44,10 +91,10 @@ public class TransactionController {
 	@RequestMapping(value = "/makeTransaction", method = RequestMethod.GET)
 	public String showTransactionForm(HttpServletRequest request, HttpServletResponse response)
 			throws IncorrectContactInfoException {
-		if(request.getSession(false)!=null){
-		request.setAttribute("myAccounts",
-				accountDao.getAllMyAccounts((String) request.getSession(false).getAttribute("username")));
-		return "makeTransaction";
+		if (request.getSession(false) != null) {
+			request.setAttribute("myAccounts",
+					accountDao.getAllMyAccounts((String) request.getSession(false).getAttribute("username")));
+			return "makeTransaction";
 		}
 		return "index";
 	}
@@ -60,21 +107,31 @@ public class TransactionController {
 		String description = request.getParameter("description");
 		Account from = accountDao.getAccountByIBAN(fromIban);
 		Account to = accountDao.getAccountByIBAN(toIban);
+		if(sum<=0){
+			request.setAttribute("errorMessage", "Сумата за всяка трансакция трябва да е по-голяма от 0.");
+			return showTransactionForm(request, response);
+		}
 		if (from != null && to != null) {
-			if (dao.isValidTransaction(from, to)) {
-				try {
+			if (transactionDao.isValidTransaction(from, to)) {
+				if (!from.equals(to)) {
 					try {
-						dao.saveTransaction(from, to, sum, description);
-					} catch (NotEnoughMoneyException e) {
-						request.setAttribute("errorMessage", "Недостатъчна наличност за изпълнение на трансакцията.");
+						try {
+							transactionDao.saveTransaction(from, to, sum, description);
+						} catch (NotEnoughMoneyException e) {
+							request.setAttribute("errorMessage",
+									"Недостатъчна наличност за изпълнение на трансакцията.");
+							return showTransactionForm(request, response);
+						}
+					} catch (InvalidTransactionInfoException e) {
+						request.setAttribute("errorMessage", "Въведената сметка не съществува.");
 						return showTransactionForm(request, response);
 					}
-				} catch (InvalidTransactionInfoException e) {
-					request.setAttribute("errorMessage", "Въведената сметка не съществува.");
+					request.setAttribute("successMessage", "Трансакцията беше извършена успешно.");
+					return showTransactionForm(request, response);
+				} else {
+					request.setAttribute("errorMessage", "Трансакция между една и съща сметка не е възможна.");
 					return showTransactionForm(request, response);
 				}
-				request.setAttribute("successMessage", "Трансакцията беше извършена успешно.");
-				return showTransactionForm(request, response);
 			} else {
 				request.setAttribute("errorMessage", "Трансакция между сметки от различна валута не е възможна.");
 				return showTransactionForm(request, response);
