@@ -9,6 +9,10 @@ public abstract class ContactInfo {
 	private String phoneNum;
 	private String email;
 
+	public ContactInfo() {
+		
+	}
+	
 	public ContactInfo(String address, String city, String country, String phoneNum, String email) throws IncorrectContactInfoException {
 		if (isValid(address)) {
 			this.address = address;
