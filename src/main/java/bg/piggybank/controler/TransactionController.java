@@ -32,17 +32,24 @@ public class TransactionController {
 	public String showTransactions(HttpServletRequest request, HttpServletResponse response)
 			throws IncorrectContactInfoException {
 		List<Transaction> transactions = new ArrayList<Transaction>();
+		if(request.getSession(false)!=null){
 		transactions = dao.listAllMyTransacions((String) request.getSession(false).getAttribute("username"));
 		request.setAttribute("transactions", transactions);
 		return "transactions";
+		}else{
+			return "index";
+		}
 	}
 
 	@RequestMapping(value = "/makeTransaction", method = RequestMethod.GET)
 	public String showTransactionForm(HttpServletRequest request, HttpServletResponse response)
 			throws IncorrectContactInfoException {
+		if(request.getSession(false)!=null){
 		request.setAttribute("myAccounts",
 				accountDao.getAllMyAccounts((String) request.getSession(false).getAttribute("username")));
 		return "makeTransaction";
+		}
+		return "index";
 	}
 
 	@RequestMapping(value = "/makeTransaction", method = RequestMethod.POST)

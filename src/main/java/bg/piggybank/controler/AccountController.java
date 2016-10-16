@@ -16,6 +16,7 @@ import bg.piggybank.model.accounts.Account;
 import bg.piggybank.model.accounts.AccountDAO;
 import bg.piggybank.model.accounts.AccountType;
 import bg.piggybank.model.accounts.CurrencyType;
+import bg.piggybank.model.amounts.AmountSaver;
 import bg.piggybank.model.exeptions.AccountException;
 import bg.piggybank.model.exeptions.FailedConnectionException;
 import bg.piggybank.model.exeptions.IncorrectContactInfoException;
@@ -37,16 +38,24 @@ public class AccountController {
 	@RequestMapping(value = "/myAccounts", method = RequestMethod.GET)
 	public String show(HttpServletRequest request, HttpServletResponse response) {
 		List<Account> accounts = new ArrayList<Account>();
+		if(request.getSession(false)!=null){
 		accounts = accountDao.getAllMyAccounts((String) request.getSession(false).getAttribute("username"));
 		request.setAttribute("accounts", accounts);
 		return "myAccounts";
+		}else{
+			return "index";
+		}
 	}
 
 	@RequestMapping(value = "/makeAccount", method = RequestMethod.GET)
 	public String create(HttpServletRequest request, HttpServletResponse response) {
+		if(request.getSession(false)!=null){
 		request.setAttribute("currencies", accountDao.getAllCurrencies());
 		request.setAttribute("accounts", accountDao.getAllAccountTypes());
 		return "makeAccount";
+		}else{
+			return "index";
+		}
 	}
 
 	@RequestMapping(value = "/makeAccount", method = RequestMethod.POST)
@@ -61,7 +70,11 @@ public class AccountController {
 		Account account = new Account(nameOfAccount, type, currency, sum);
 		try {
 			accountDao.registrateUserAccount(user, account);
-			request.setAttribute("successMessage", "Успешна трансакция");
+			request.setAttribute("successMessage", "Сметката е създадена успешно.");
+			int accountId=accountDao.getAccountIDByIBAN(Account.cryptIban(account.getIBAN()));
+			Thread amountSaver= new Thread(new AmountSaver(accountId, accountDao));
+			amountSaver.setDaemon(true);
+			amountSaver.start();
 			return show(request, response);
 		} catch (InvalidAccountInfoException e) {
 			request.setAttribute("errorMessage", "Невалиден тип на сметката");
