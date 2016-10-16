@@ -14,7 +14,10 @@ import org.springframework.stereotype.Component;
 
 import bg.piggybank.model.DBConnection;
 import bg.piggybank.model.accounts.Account;
+import bg.piggybank.model.accounts.AccountType;
+import bg.piggybank.model.accounts.CurrencyType;
 import bg.piggybank.model.exeptions.FailedConnectionException;
+import bg.piggybank.model.exeptions.InvalidTransactionInfoException;
 import bg.piggybank.model.exeptions.NotEnoughMoneyException;
 import bg.piggybank.model.user.User;
 
@@ -34,60 +37,61 @@ public class TransactionDAO {
 
 	public int getAccountID(String iban, Connection connection) throws SQLException {
 		PreparedStatement ps = connection.prepareStatement(SELECT_ACCOUNT_ID);
-		ps.setString(1, Account.cryptIban(iban));
+		String ibanche = Account.cryptIban(iban);
+		System.out.println(ibanche);
+		ps.setString(1, ibanche);
 		ResultSet resultSet = ps.executeQuery();
 		resultSet.next();
-		int accountID = resultSet.getInt("id");
+		int accountID = resultSet.getInt(1);
 		return accountID;
 	}
 
-	public boolean saveTransaction(Account from, Account to, double sum, String description) {
+	public boolean saveTransaction(Account from, Account to, double sum, String description)
+			throws InvalidTransactionInfoException, NotEnoughMoneyException {
 		Connection connection = null;
 		try {
 			connection = DBConnection.getInstance().getConnection();
 			connection.setAutoCommit(false);
 
-			int fromAccountID = getAccountID(Account.decryptIban(from.getIBAN()), connection);
-			int toAccountID = getAccountID(Account.decryptIban(to.getIBAN()), connection);
+			int fromAccountID = getAccountID(from.getIBAN(), connection);
+			int toAccountID = getAccountID(to.getIBAN(), connection);
+			if (fromAccountID != toAccountID) {
+				PreparedStatement statement = DBConnection.getInstance().getConnection()
+						.prepareStatement(INSERT_TRANSACTION, Statement.RETURN_GENERATED_KEYS);
+				long timeNow = Calendar.getInstance().getTimeInMillis();
+				java.sql.Timestamp date = new java.sql.Timestamp(timeNow);
 
-			PreparedStatement statement = DBConnection.getInstance().getConnection()
-					.prepareStatement(INSERT_TRANSACTION, Statement.RETURN_GENERATED_KEYS);
-			long timeNow = Calendar.getInstance().getTimeInMillis();
-			java.sql.Timestamp date = new java.sql.Timestamp(timeNow);
+				statement.setTimestamp(1, date);
+				statement.setDouble(2, sum);
+				statement.setString(3, description);
+				statement.setInt(4, fromAccountID);
+				statement.setInt(5, toAccountID);
+				int count = statement.executeUpdate();
+				statement.close();
 
-			statement.setTimestamp(1, date);
-			statement.setDouble(2, sum);
-			statement.setString(3, description);
-			statement.setInt(4, fromAccountID);
-			statement.setInt(5, toAccountID);
-			int count = statement.executeUpdate();
-			statement.close();
-
-			double newSumFrom = 0;
-			try {
+				double newSumFrom = 0;
 				newSumFrom = from.decreaseAmount(sum);
-			} catch (NotEnoughMoneyException e) {
-				e.printStackTrace();
-			}
-			double newSumTo = to.increaseAmount(sum);
-			PreparedStatement updateStatement = connection
-					.prepareStatement("UPDATE accounts SET sum = ? where id = ?;");
-			updateStatement.setDouble(1, newSumFrom);
-			updateStatement.setInt(2, fromAccountID);
-			int countUpdatesInFrom = updateStatement.executeUpdate();
+				double newSumTo = to.increaseAmount(sum);
+				PreparedStatement updateStatement = connection
+						.prepareStatement("UPDATE accounts SET sum = ? where id = ?;");
+				updateStatement.setDouble(1, newSumFrom);
+				updateStatement.setInt(2, fromAccountID);
+				int countUpdatesInFrom = updateStatement.executeUpdate();
 
-			PreparedStatement updateStatement2 = connection
-					.prepareStatement("UPDATE accounts SET sum = ? where id = ?;");
-			updateStatement2.setDouble(1, newSumTo);
-			updateStatement2.setInt(2, toAccountID);
-			int countUpdatesInTo = updateStatement2.executeUpdate();
+				PreparedStatement updateStatement2 = connection
+						.prepareStatement("UPDATE accounts SET sum = ? where id = ?;");
+				updateStatement2.setDouble(1, newSumTo);
+				updateStatement2.setInt(2, toAccountID);
+				int countUpdatesInTo = updateStatement2.executeUpdate();
 
-			connection.commit();
-			connection.setAutoCommit(true);
-			if (count > 0) {
-				System.out.println("New transaction was made");
+				connection.commit();
+				if (count > 0) {
+					System.out.println("New transaction was made");
 
-				return true;
+					return true;
+				}
+			} else {
+				throw new InvalidTransactionInfoException("Can't make a transaction between only one account!");
 			}
 
 		} catch (SQLException | FailedConnectionException e) {
@@ -98,6 +102,12 @@ public class TransactionDAO {
 				System.out.println("Tuka da hvurlq nov exception");
 			}
 
+		}finally{
+			try {
+				connection.setAutoCommit(true);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 		return false;
 	}
@@ -117,19 +127,18 @@ public class TransactionDAO {
 			return transactions;
 
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return transactions;
 	}
 
-	public List<Transaction> listAllMyTransacions(User user) {
+	public List<Transaction> listAllMyTransacions(String username) {
 		List<Transaction> myTransactions = new ArrayList<Transaction>();
 		try {
 			Connection connection = DBConnection.getInstance().getConnection();
 			PreparedStatement ps = connection.prepareStatement(SELECT_ALL_USER_TRANSACTIONS);
-			ps.setString(1, user.getUsername());
-			ps.setString(2, user.getUsername());
+			ps.setString(1, username);
+			ps.setString(2, username);
 
 			ResultSet resultSet = ps.executeQuery();
 
@@ -145,6 +154,16 @@ public class TransactionDAO {
 		}
 		return myTransactions;
 
+	}
+
+	public boolean isValidTransaction(Account from, Account to) {
+		System.out.println(from.getCurrency().toString());
+		System.out.println(to.getCurrency().toString());
+		if (from.getCurrency().toString().equals(to.getCurrency().toString())) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 }

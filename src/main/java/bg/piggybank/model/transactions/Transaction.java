@@ -39,7 +39,8 @@ public class Transaction extends BasicInfo {
 			}
 		}
 	}
-	s	
+	
+	
 
 	@Override
 	public String toString() {
