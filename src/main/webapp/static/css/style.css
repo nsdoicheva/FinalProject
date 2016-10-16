@@ -104,8 +104,10 @@ a:active {
 
 .error-message{
 	color: red;	
+	font-weight: bold;
 }
 
 .success-message{
 	color: lightgreen;	
+	font-weight: bold;
 }
