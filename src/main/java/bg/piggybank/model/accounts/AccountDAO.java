@@ -1,12 +1,8 @@
 package bg.piggybank.model.accounts;
 
 import bg.piggybank.model.DBConnection;
-import bg.piggybank.model.amounts.AmountSaver;
 import bg.piggybank.model.exeptions.*;
 
-import java.security.InvalidKeyException;
-import java.security.Key;
-import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,16 +12,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import bg.piggybank.*;
 import bg.piggybank.model.user.*;
 
 @Component
@@ -37,12 +27,13 @@ public class AccountDAO {
 	private static final String GET_CURRENCY_ID = "SELECT type FROM currencies WHERE type  LIKE (?)";
 	private static final String GET_ACCOUNT_ID = "SELECT id from accounttypes WHERE name LIKE (?)";
 	private static final String GET_ACCOUNTS_COUNT = "SELECT COUNT(*) FROM accounts ;";
-	private static final String SELECT_ACCOUNT_BY_IBAN = "SELECT name, sum, currencies_type, accountTypes_id FROM accounts WHERE IBAN=? ;";
+	private static final String SELECT_ACCOUNT_BY_IBAN = "SELECT id, name, sum, currencies_type, accountTypes_id FROM accounts WHERE IBAN=? ;";
 	private static final String SELECT_ACCOUNT_TYPE_BY_ID = "SELECT name FROM accounttypes WHERE id=? ;";
 	private static final String SELECT_USER_ACCOUNTS = "SELECT name, sum, IBAN, currencies_type, accountTypes_id FROM accounts WHERE users_id=?;";
 	private static final String SELECT_ACCOUNT_BY_ID = "SELECT id, name, sum, IBAN, currencies_type, accountTypes_id FROM accounts WHERE id = ?;";
 	private static final String SELECT_ACCOUNT_ID = "SELECT id FROM accounts WHERE IBAN= ?;";
 	private static final String SELECT_ALL_ACCOUNTS = "SELECT id FROM accounts;";
+	private static final String SELECT_ACCOUNT_ID_BY_USER_ID = "SELECT id FROM accounts WHERE users_id = ?;";
 
 	public int registrateUserAccount(User user, Account account)
 			throws UserInfoException, AccountException, InvalidAccountInfoException, InvalidAccountException {
@@ -174,15 +165,19 @@ public class AccountDAO {
 			statement.setString(1, Account.cryptIban(IBAN));
 			ResultSet resultSet = statement.executeQuery();
 			if (resultSet.next()) {
+				int id= resultSet.getInt("id");
 				String name = resultSet.getString("name");
 				int typeID = resultSet.getInt("accountTypes_id");
 				String currency = resultSet.getString("currencies_type");
 				double sum = resultSet.getDouble("sum");
-				AccountType type = getAccountTypeByID(connection, resultSet.getInt("accountTypes_id"));
+				AccountType type = getAccountTypeByID(connection, typeID);
 				CurrencyType currType = getCurrencyType(currency);
 				account = new Account(name, type, currType, sum);
 				account.setIbanFromDB(IBAN);
+				account.setId(id);
 				return account;
+			}else{
+				System.out.println("No such IBAN!");
 			}
 
 		} catch (FailedConnectionException e) {
@@ -317,6 +312,26 @@ public class AccountDAO {
 			e.printStackTrace();
 		}
 		return list;
+	}
+	
+	public List<Integer> getAccountIDByUserID(int userID){
+		List<Integer> accounts= new ArrayList<Integer>();
+		Connection connection;
+		try {
+			connection = DBConnection.getInstance().getConnection();
+			PreparedStatement statement = connection.prepareStatement(SELECT_ACCOUNT_ID_BY_USER_ID);
+			statement.setInt(1, userID);
+			ResultSet result = statement.executeQuery();
+			while (result.next()) {
+				int id = result.getInt("id");
+				accounts.add(id);
+			}
+		} catch (SQLException | FailedConnectionException e) {
+			e.printStackTrace();
+			return accounts;
+		}
+		return accounts;
+		
 	}
 
 }
