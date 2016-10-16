@@ -10,22 +10,20 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.iban4j.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
 import bg.piggybank.model.exeptions.*;
 import bg.piggybank.model.BasicInfo;
-import bg.piggybank.model.configurations.DAOConfig;
+import bg.piggybank.model.configurations.Config;
 
-@ContextConfiguration(classes= DAOConfig.class)
+@ContextConfiguration(classes= Config.class)
 public class Account extends BasicInfo {
+	private int id;
 	private String name;
 	private String IBAN;
 	private AccountType type;
 	private CurrencyType currency;
 	private List<Card> cards = new ArrayList<Card>();
-	@Autowired
-	private AccountDAO accountDAO;
 
 	public Account(String name, AccountType type, CurrencyType currency, double sum) {
 		super(sum);
@@ -142,16 +140,16 @@ public class Account extends BasicInfo {
 			Key aesKey = new SecretKeySpec(key.getBytes(), "AES");
 			Cipher cipher = Cipher.getInstance("AES");
 			// encrypt the text
-			cipher.init(Cipher.ENCRYPT_MODE, aesKey);
-			byte[] encrypted = cipher.doFinal(iban.getBytes());
+			//cipher.init(Cipher.ENCRYPT_MODE, aesKey);
+			//byte[] encrypted = cipher.doFinal(iban.getBytes());
 
-			StringBuilder sb = new StringBuilder();
+			/*StringBuilder sb = new StringBuilder();
 			for (byte b : encrypted) {
 				sb.append((char) b);
-			}
+			}*/
 			// the encrypted String
-			String enc = sb.toString();
-
+			//String enc = sb.toString();
+			String enc= iban;
 			// now convert the string to byte array
 			// for decryption
 			byte[] bb = new byte[enc.length()];
@@ -186,6 +184,10 @@ public class Account extends BasicInfo {
 	public void setName(String name) {
 		this.name = name;
 	}
+	
+	public void setIbanFromDB(String IBAN) {
+		this.IBAN = IBAN;
+	}
 
 	public String getIBAN() {
 		return IBAN;
@@ -198,5 +200,23 @@ public class Account extends BasicInfo {
 	public CurrencyType getCurrency() {
 		return currency;
 	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		if(id>0){
+		this.id = id;
+		}else{
+			try {
+				throw new AccountException("Invalid account id passed to setter");
+			} catch (AccountException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	
 
 }
