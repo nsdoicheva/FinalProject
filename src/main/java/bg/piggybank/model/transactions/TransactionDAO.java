@@ -27,7 +27,7 @@ public class TransactionDAO {
 	private final static String SELECT_ALL_TRANSACTIONS = "SELECT t.sum , u.username as sender, us.username as receiver, t.description "
 			+ "FROM transactions t join accounts a on t.fromAccount_id = a.id join accounts ac on t.toAccount_id = ac.id "
 			+ "JOIN users u ON u.id=a.users_id JOIN users us ON us.id=ac.users_id ; ";
-
+        private static final String UPDATE_ACCOUNTS_SUM = "UPDATE accounts SET sum = ? where id = ?;";      
 	private final static String SELECT_ALL_USER_TRANSACTIONS = "SELECT t.sum , u.username as sender, us.username as receiver, t.description, t.fromAccount_id, t.toAccount_id "
 			+ "FROM transactions t join accounts a on t.fromAccount_id = a.id join accounts ac on t.toAccount_id = ac.id "
 			+ "JOIN users u ON u.id=a.users_id JOIN users us ON us.id=ac.users_id WHERE u.username= ? OR us.username=?; ";
@@ -63,7 +63,7 @@ public class TransactionDAO {
 				PreparedStatement statement = DBConnection.getInstance().getConnection()
 						.prepareStatement(INSERT_TRANSACTION, Statement.RETURN_GENERATED_KEYS);
 				long timeNow = Calendar.getInstance().getTimeInMillis();
-				java.sql.Timestamp date = new java.sql.Timestamp(timeNow);
+				Timestamp date = Timestamp(timeNow);
 
 				statement.setTimestamp(1, date);
 				statement.setDouble(2, sum);
@@ -77,13 +77,13 @@ public class TransactionDAO {
 				newSumFrom = from.decreaseAmount(sum);
 				double newSumTo = to.increaseAmount(sum);
 				PreparedStatement updateStatement = connection
-						.prepareStatement("UPDATE accounts SET sum = ? where id = ?;");
+						.prepareStatement(UPDATE_ACCOUNTS_SUM);
 				updateStatement.setDouble(1, newSumFrom);
 				updateStatement.setInt(2, fromAccountID);
 				updateStatement.executeUpdate();
 
 				PreparedStatement updateStatement2 = connection
-						.prepareStatement("UPDATE accounts SET sum = ? where id = ?;");
+						.prepareStatement(UPDATE_ACCOUNTS_SUM);
 				updateStatement2.setDouble(1, newSumTo);
 				updateStatement2.setInt(2, toAccountID);
 				updateStatement2.executeUpdate();
@@ -103,7 +103,7 @@ public class TransactionDAO {
 			try {
 				connection.rollback();
 			} catch (SQLException e1) {
-				System.out.println("Tuka da hvurlq nov exception");
+				e1.printStackTrace();
 			}
 
 		} finally {
