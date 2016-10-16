@@ -7,18 +7,22 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.springframework.stereotype.Component;
 
+import bg.piggybank.model.Checkers;
 import bg.piggybank.model.DBConnection;
+import bg.piggybank.model.PasswordGenerator;
 import bg.piggybank.model.exeptions.*;
 
 @Component
 public class UserDAO {
-	
+
 	private static final String CAPITAL_LETTER = "A";
 	private static final String INSERT_INTO_COUNTRIES = "INSERT INTO countries VALUES(null,?);";
 	private static final String INSERT_INTO_CITIES = "INSERT INTO cities VALUES(null,?,?);";
@@ -32,12 +36,19 @@ public class UserDAO {
 	private static final String SELECT_ADDRESS_BY_ID = "SELECT street FROM adresses WHERE id=?;";
 	private static final String SELECT_USER_SQL = "SELECT username, password FROM users WHERE username = ? AND password = md5(?)";
 	private static final String SELECT_USER_BY_USERNAME = "SELECT id, password, name, egn, email, phoneNum, citizenship, adress_id FROM users WHERE username= ?;";
+	private static final String SELECT_NUMBER_OF_USERS = "SELECT COUNT(*) as users FROM users";
+	private static final String SELECT_USER_WITH_EMAIL = "SELECT id FROM users WHERE email=?;";
+	private static final String UPDATE_FORGOTTEN_PASSWORD = "UPDATE users SET password= md5(?) WHERE email=?;";
+	private static final String UPDATE_USER_PASSWORD = "UPDATE users SET password= md5(?) WHERE username=?;";
+	private static final String SELECT_CURRENT_USER = "SELECT u.username , u.name , u.egn, u.email, u.phoneNum , u.citizenship, a.street, c.name as city, co.name as country "
+			+ "From users u join adresses a on u.adress_id = a.id join cities c on a.city_id = c.id "
+			+ "join countries co on c.country_id = co.id where u.username = ?;";
+	private static final String SELECT_USERS_PASSWORD = "SELECT password FROM users WHERE password=? AND id=?;";
 	private static List<User> users = Collections.synchronizedList(new ArrayList<User>());
-
 
 	public int saveUserAddress(String address, String city, String country) {
 		int id = 0;
-		Connection connection =null;
+		Connection connection = null;
 		try {
 			connection = DBConnection.getInstance().getConnection();
 			int cityId = 0;
@@ -91,13 +102,13 @@ public class UserDAO {
 			ps.close();
 		} catch (SQLException e) {
 			System.out.println("User cannot be logged right now.");
+			e.printStackTrace();
 		} catch (FailedConnectionException e) {
 			System.out.println("No connection");
 		}
 		return true;
 	}
-	
-	
+
 	public Set<User> getAllUsersFromDB() {
 		Set<User> users = new TreeSet<User>();
 		try {
@@ -132,7 +143,7 @@ public class UserDAO {
 	public int saveUser(User user) {
 		int userId = 0;
 		if (!users.contains(user)) {
-			Connection connection =null;
+			Connection connection = null;
 			try {
 				connection = DBConnection.getInstance().getConnection();
 				connection.setAutoCommit(false);
@@ -180,7 +191,7 @@ public class UserDAO {
 				} catch (SQLException e1) {
 					e1.printStackTrace();
 				}
-			}finally{
+			} finally {
 				try {
 					connection.setAutoCommit(true);
 				} catch (SQLException e) {
@@ -384,7 +395,7 @@ public class UserDAO {
 		statement.close();
 		return addressId;
 	}
-	
+
 	public User getUserByUsername(String username) {
 		User user = null;
 		Connection connection = null;
@@ -396,7 +407,7 @@ public class UserDAO {
 			ResultSet result = statement.executeQuery();
 			if (result.next()) {
 				String name = result.getString("name");
-				String password = result.getString("password")+CAPITAL_LETTER;
+				String password = result.getString("password") + CAPITAL_LETTER;
 				String EGN = result.getString("EGN");
 				String email = result.getString("email");
 				String phoneNum = result.getString("phoneNum");
@@ -423,11 +434,181 @@ public class UserDAO {
 			}
 			e.printStackTrace();
 			return user;
-		}finally{
+		} finally {
 			try {
 				connection.setAutoCommit(true);
 			} catch (SQLException e) {
 				e.printStackTrace();
+			}
+		}
+	}
+
+	public int countOfUsers() {
+		int allUsers = 0;
+		try {
+			Connection connection = DBConnection.getInstance().getConnection();
+			PreparedStatement ps = connection.prepareStatement(SELECT_NUMBER_OF_USERS);
+			ResultSet resultSet = ps.executeQuery();
+
+			if (resultSet.next()) {
+				allUsers = resultSet.getInt("users");
+			}
+
+		} catch (SQLException e) {
+			System.out.println("User cannot be logged right now.");
+		} catch (FailedConnectionException e) {
+			System.out.println("No connection");
+		}
+		return allUsers;
+	}
+
+	public boolean doesEmailExist(String email) {
+		Connection connection = null;
+
+		try {
+			connection = DBConnection.getInstance().getConnection();
+
+			PreparedStatement statement = connection.prepareStatement(SELECT_USER_WITH_EMAIL);
+			statement.setString(1, email);
+			ResultSet result = statement.executeQuery();
+			if (result.next()) {
+				System.out.println("EXISTS");
+				return true;
+			} else {
+				System.out.println("DOESN'T EXIST");
+				return false;
+			}
+		} catch (FailedConnectionException | SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+
+	}
+
+	public String generateNewPassword(String email) {
+		Connection connection = null;
+		String password = null;
+		try {
+			connection = DBConnection.getInstance().getConnection();
+			PasswordGenerator generator = new PasswordGenerator();
+			PreparedStatement statement = connection.prepareStatement(UPDATE_FORGOTTEN_PASSWORD);
+			password = generator.generatePassword();
+			statement.setString(1, password);
+			statement.setString(2, email);
+			int result = statement.executeUpdate();
+			if (result > 0) {
+				return password;
+			} else {
+				try {
+					throw new UserInfoException("Can't change password");
+				} catch (UserInfoException e) {
+					e.printStackTrace();
+				}
+			}
+		} catch (FailedConnectionException | SQLException e) {
+			e.printStackTrace();
+		}
+		return password;
+	}
+
+	public boolean changePassword(String username, String password) {
+		Connection connection = null;
+		if (Checkers.isStringValid(username) && Checkers.isStringValid(password)) {
+			try {
+				connection = DBConnection.getInstance().getConnection();
+				PreparedStatement statement = connection.prepareStatement(UPDATE_USER_PASSWORD);
+				statement.setString(1, password);
+				statement.setString(2, username);
+				int result = statement.executeUpdate();
+				if (result > 0) {
+					return true;
+				} else {
+					try {
+						throw new UserInfoException("Can't change password");
+					} catch (UserInfoException e) {
+						e.printStackTrace();
+						return false;
+					}
+				}
+			} catch (FailedConnectionException | SQLException e) {
+				e.printStackTrace();
+				return false;
+			}
+		} else {
+			try {
+				throw new UserInfoException("Invalid username/password.");
+			} catch (UserInfoException e) {
+				e.printStackTrace();
+				return false;
+			}
+		}
+	}
+
+	public Map<String, String> getCurrentUserInfo(String username) {
+		Map<String, String> userInfo = new HashMap<String, String>();
+		try {
+			Connection connection = DBConnection.getInstance().getConnection();
+			PreparedStatement statement = connection.prepareStatement(SELECT_CURRENT_USER);
+
+			statement.setString(1, username);
+			ResultSet result = statement.executeQuery();
+			if (result.next()) {
+				String name = result.getString("name");
+				String egn = result.getString("egn");
+				String email = result.getString("email");
+				String phoneNum = result.getString("phoneNum");
+				String citizen = result.getString("citizenship");
+				String street = result.getString("street");
+				String city = result.getString("city");
+				String country = result.getString("country");
+				userInfo.put("username", username);
+				userInfo.put("name", name);
+				userInfo.put("egn", egn);
+				userInfo.put("email", email);
+				userInfo.put("phoneNum", phoneNum);
+				userInfo.put("citizenship", citizen);
+				userInfo.put("street", street);
+				userInfo.put("city", city);
+				userInfo.put("country", country);
+				return userInfo;
+			}
+			return userInfo;
+		} catch (SQLException | FailedConnectionException e) {
+			System.out.println("Cannot make statement!");
+			e.printStackTrace();
+			return userInfo;
+		}
+	}
+	
+	public boolean passwordCheck(int userId, String password){
+		Connection connection = null;
+		if (Checkers.isStringValid(password)) {
+			try {
+				connection = DBConnection.getInstance().getConnection();
+				PreparedStatement statement = connection.prepareStatement(SELECT_USERS_PASSWORD);
+				statement.setString(1, password);
+				statement.setInt(2, userId);
+				ResultSet result = statement.executeQuery();
+				if (result.next()) {
+					return true;
+				} else {
+					try {
+						throw new UserInfoException("Incorrect password");
+					} catch (UserInfoException e) {
+						e.printStackTrace();
+						return false;
+					}
+				}
+			} catch (FailedConnectionException | SQLException e) {
+				e.printStackTrace();
+				return false;
+			}
+		} else {
+			try {
+				throw new UserInfoException("Invalid password.");
+			} catch (UserInfoException e) {
+				e.printStackTrace();
+				return false;
 			}
 		}
 
