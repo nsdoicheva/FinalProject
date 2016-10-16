@@ -11,7 +11,7 @@
 <!--<![endif]-->
 <head>
 <!-- Title -->
-<title>PiggyBank Трансакции</title>
+<title>PiggyBank Моите Карти</title>
 <!-- Meta -->
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <meta name="description" content="">
@@ -56,7 +56,7 @@
 				</div>
 				<!-- End Logo -->
 			</div>
-			<!-- Top Menu -->
+		<!-- Top Menu -->
 			<div id="hornav" class="row text-light">
 				<div class="col-md-12">
 					<div class="text-center visible-lg">
@@ -103,10 +103,10 @@
 				<!-- Begin Sidebar Menu -->
 				<div class="col-md-3">
 					<ul class="list-group sidebar-nav" id="sidebar-nav">
-						<li class="list-group-item"><a href="transactions.html">Моите
-								трансакции</a></li>
-						<li class="list-group-item"><a href="makeTransaction.html">Нова
-								трансакция</a></li>
+						<li class="list-group-item"><a href="myCards.html">Моите
+								карти</a></li>
+						<li class="list-group-item"><a href="makeCard.html">Нова
+								карта</a></li>
 					</ul>
 				</div>
 				<!-- Main Text -->

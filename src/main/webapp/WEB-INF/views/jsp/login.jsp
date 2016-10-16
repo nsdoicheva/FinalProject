@@ -49,8 +49,8 @@
 </head>
 <body>
 	<%
-		if (request.getSession(false)!= null) {
-			response.sendRedirect("index.jsp");
+		if (request.getSession(false) != null) {
+			response.sendRedirect("index");
 		}
 	%>
 	<!-- Header -->
@@ -85,15 +85,15 @@
 					<form method="POST" class="col-lg-11"
 						onsubmit="return validateForm()">
 						<input type="text" name="username" placeholder="Потребителско име"
-							class="input-txt" /> 
-				<input type="password" name="password" placeholder="Парола" class="input-txt"  />
+							class="input-txt" /> <input type="password" name="password"
+							placeholder="Парола" class="input-txt" />
 						<div class="login-footer">
 							<a href="#" class="lnk"> </a>
 							<button type="button" id="btn-reg" class="btn btn--reg">Регистрирай
 								се</button>
 							<button type="submit" class="btn btn--right">Вход</button>
 							<br> <br> <br> <span class="icon icon--min">ಠ╭╮ಠ
-							</span> <a href="forgotPassword.html"> Забравена парола?</a>
+							</span> <a href="passwordForgotten.html"> Забравена парола?</a>
 						</div>
 					</form>
 				</div>
@@ -107,6 +107,7 @@
 							<li><a href="index.html" class="fa-home active">Начало</a></li>
 							<li><a href="contact.html" class="fa-comment ">Контакти</a></li>
 						</ul>
+						<div style="font-size:20px;">Регистрирали се: <div class="success-message"><c:out value="${count}" /></div></div>
 					</div>
 				</div>
 			</div>

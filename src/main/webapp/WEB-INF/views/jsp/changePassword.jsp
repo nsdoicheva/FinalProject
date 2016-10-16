@@ -1,17 +1,12 @@
-<%@ page contentType="text/html; charset=UTF-8" session="false"%>
-<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
-<!-- === BEGIN HEADER === -->
+<%@ page contentType="text/html; charset=UTF-8" session="false"%>
 <!DOCTYPE html>
-<!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
-<!--[if IE 9]> <html lang="en" class="ie9"> <![endif]-->
-<!--[if !IE]><!-->
+
 <html lang="en">
 <!--<![endif]-->
 <head>
 <!-- Title -->
-<title>PiggyBank Сметки</title>
+<title>PiggyBank Регистрация</title>
 <!-- Meta -->
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <meta name="description" content="">
@@ -21,6 +16,30 @@
 <!-- Favicon -->
 <link href="favicon.ico" rel="shortcut icon">
 <link rel="icon" href="img/prase.png">
+
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script>
+	function alert() {
+		confirm("Сигурни ли сте, че искате да изпратите информацията?")
+	}
+</script>
+
+<script>
+	function validateForm() {
+		var fields = [ "name", "password", "username", "email", "telephone",
+				"address", "city", "country", "citizen" ];
+
+		var i, l = fields.length;
+		var fieldname;
+		for (i = 0; i < l; i++) {
+			fieldname = fields[i];
+			if (document.forms["register"][fieldname].value === "") {
+				return false;
+			}
+		}
+		return true;
+	}
+</script>
 <!-- Bootstrap Core CSS -->
 <link rel="stylesheet" href="css/bootstrap.css">
 <!-- Template CSS -->
@@ -36,11 +55,6 @@
 	type="text/css" rel="stylesheet">
 </head>
 <body>
-	<%
-		if (request.getSession(false) == null) {
-			response.sendRedirect("login");
-		}
-	%>
 	<!-- Header -->
 	<div id="header"
 		style="background-position: 50% 0%; <br />
@@ -51,8 +65,9 @@
 			<div class="row">
 				<!-- Logo -->
 				<div class="logo">
-					<a href="index.html" title=""><img src="img/logo_bank.png"
-						alt="Logo" /></a>
+					<a href="index.html" title=""> <img src="img/logo_bank.png"
+						alt="Logo" />
+					</a>
 				</div>
 				<!-- End Logo -->
 			</div>
@@ -99,50 +114,67 @@
 	<!-- === BEGIN CONTENT === -->
 	<div id="content">
 		<div class="container background-white">
-			<div class="row margin-vert-40">
-				<!-- Begin Sidebar Menu -->
+			<div class="row margin-vert-30">
 				<div class="col-md-3">
 					<ul class="list-group sidebar-nav" id="sidebar-nav">
-						<li class="list-group-item"><a href="myAccounts.html">Моите
-								сметки</a></li>
-						<li class="list-group-item"><a href="makeAccount.html">Нова
-								сметка</a></li>
-						<li class="list-group-item"><a href="amounts.html">Наличности</a></li>
+						<li class="list-group-item"><a href="personalInfo.html">Лична
+								информация</a></li>
+						<li class="list-group-item"><a href="changePassword.html">Смяна
+								на паролата</a></li>
+						<li class="list-group-item"><a href="toDoList.html">ToDo
+								лист</a></li>
+						<li class="list-group-item"><a href="logout.html">Изход</a></li>
 					</ul>
 				</div>
-				<!-- Main Text -->
+				<!-- Main Column -->
 				<div class="col-md-9">
-					<h2 class="margin-bottom-30">Сметки</h2>
+					<!-- Main Content -->
+					<div class="headline">
+						<h2 class="margin-bottom-20">Смяна на паролата</h2>
+					</div>
+					<p>Използвайте формата, за да промените своята парола.</p>
+					<br>
+					<!-- Contact Form -->
+					<div class="error-message">
+						<c:if test="${not empty errorMessage}">
+							<c:out value="${errorMessage}" />
+						</c:if>
+					</div>
 					<div class="success-message">
 						<c:if test="${not empty successMessage}">
 							<c:out value="${successMessage}" />
 						</c:if>
 					</div>
-					<table>
-						<tr>
-							<th>Име</th>
-							<th>IBAN</th>
-							<th>Сума</th>
-							<th>Валута</th>
-							<th>Тип</th>
-						</tr>
+					<form class="register" method="POST">
+						<label>Стара парола</label>
+						<div class="row margin-bottom-20">
+							<div class="col-md-6 col-md-offset-0">
+								<input name="oldPassword" class="form-control" type="password"
+									required="required" placeholder="Стара парола"> <label>Нова
+									парола</label>
+								<div class="row margin-bottom-20">
+									<div class="col-md-6 col-md-offset-0">
+										<input name="password" class="form-control" type="password"
+											required="required" placeholder="Нова парола"
+											data-validation="strength" data-validation-strength="3">
+									</div>
+									<p style="color: #000000; font-size: 12px">Трябва да
+										съдържа поне 6 знака, една главна буква, цифра и символ.</p>
+								</div>
 
-						<c:forEach items="${accounts}" var="account">
-							<tr>
-								<td>${account.name}</td>
-								<td>${account.IBAN}</td>
-								<td>${account.sum}</td>
-								<td>${account.currency}</td>
-								<td>${account.type}</td>
-							</tr>
-						</c:forEach>
-					</table>
+								<p>
+									<button type="submit" class="btn btn-primary"
+										onsubmit="return validateForm()">Смени</button>
+								</p>
+					</form>
+					<!-- End Contact Form -->
+					<!-- End Main Content -->
 				</div>
-				<!-- End Main Text -->
+				<!-- End Side Column -->
 			</div>
 		</div>
 	</div>
-	<!-- End Content -->
+	<!-- === END CONTENT === -->
 	<!-- === BEGIN FOOTER === -->
 	<div id="base" class="background-dark text-light">
 		<div class="container padding-vert-30">
@@ -170,12 +202,13 @@
 			</div>
 		</div>
 		<!-- End Footer -->
-
+		<!-- JS -->
 		<script type="text/javascript" src="js/jquery.min.js"></script>
 		<script type="text/javascript" src="js/bootstrap.min.js"></script>
 		<script type="text/javascript" src="js/scripts.js"></script>
 		<!-- Isotope - Portfolio Sorting -->
 		<script type="text/javascript" src="js/jquery.isotope.js"></script>
+		<script type="text/javascript" src="js/redirect.js"></script>
 		<!-- Mobile Menu - Slicknav -->
 		<script type="text/javascript" src="js/jquery.slicknav.js"></script>
 		<!-- Animate on Scroll-->
@@ -187,11 +220,26 @@
 		<!-- Sticky Div -->
 		<script type="text/javascript" src="js/jquery.sticky.js"
 			charset="utf-8"></script>
+		<script type="text/javascript" src="js/index.js" charset="utf-8"></script>
 		<!-- Slimbox2-->
 		<script type="text/javascript" src="js/slimbox2.js" charset="utf-8"></script>
 		<!-- Modernizr -->
-		<script src="js/modernizr.custom.js" type="text/javascript"></script>
+		<script src="assets/js/modernizr.custom.js" type="text/javascript"></script>
 		<!-- End JS -->
+		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+		<script
+			src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+		<script
+			src="https://cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.3.26/jquery.form-validator.min.js"></script>
+		<script>
+			$.validate();
+			$.validate({
+				modules : 'security',
+				onModulesLoaded : function() {
+					$('input[name="password"]').displayPasswordStrength();
+				}
+			});
+		</script>
 </body>
 </html>
 <!-- === END FOOTER === -->

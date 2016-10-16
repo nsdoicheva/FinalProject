@@ -1,17 +1,13 @@
-<%@ page contentType="text/html; charset=UTF-8"%>
-<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
-<!-- === BEGIN HEADER === -->
+<%@ page contentType="text/html; charset=UTF-8" session="false"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
 <!DOCTYPE html>
-<!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
-<!--[if IE 9]> <html lang="en" class="ie9"> <![endif]-->
-<!--[if !IE]><!-->
+
 <html lang="en">
-<!--<![endif]-->
+
 <head>
 <!-- Title -->
-<title>PiggyBank Трансакции</title>
+<title>PiggyBank ToDo лист</title>
 <!-- Meta -->
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <meta name="description" content="">
@@ -38,7 +34,7 @@
 <body>
 	<%
 		if (request.getSession(false) == null) {
-			response.sendRedirect("login");
+			response.sendRedirect("contact");
 		}
 	%>
 	<!-- Header -->
@@ -51,8 +47,9 @@
 			<div class="row">
 				<!-- Logo -->
 				<div class="logo">
-					<a href="index.html" title=""><img src="img/logo_bank.png"
-						alt="Logo" /></a>
+					<a href="index.html" title=""> <img src="img/logo_bank.png"
+						alt="Logo" />
+					</a>
 				</div>
 				<!-- End Logo -->
 			</div>
@@ -99,40 +96,31 @@
 	<!-- === BEGIN CONTENT === -->
 	<div id="content">
 		<div class="container background-white">
-			<div class="row margin-vert-40">
-				<!-- Begin Sidebar Menu -->
+			<div class="row margin-vert-30">
 				<div class="col-md-3">
 					<ul class="list-group sidebar-nav" id="sidebar-nav">
-						<li class="list-group-item"><a href="transactions.html">Моите
-								трансакции</a></li>
-						<li class="list-group-item"><a href="makeTransaction.html">Нова
-								трансакция</a></li>
+						<li class="list-group-item"><a href="personalInfo.html">Лична
+								информация</a></li>
+						<li class="list-group-item"><a href="changePassword.html">Смяна
+								на паролата</a></li>
+						<li class="list-group-item"><a href="toDoList.html">ToDo
+								лист</a></li>
+						<li class="list-group-item"><a href="logout.html">Изход</a></li>
 					</ul>
 				</div>
-				<!-- Main Text -->
-				<label>За сметка: </label>
-				<form method="POST">
-					<div class="row margin-bottom-20">
-						<div class="col-md-6 col-md-offset-0">
-							<select id="account" name="fromIban">
-								<option value="Всички">Всички</option>
-								<c:forEach var="account" items="${myAccounts}">
-									<option value="${account.getIBAN()}">${account.getIBAN()}</option>
-								</c:forEach>
-							</select>
-							<p>
-								<button type="submit" class="btn btn-primary">Изпрати</button>
-							</p>
+				<div class="col-md-9">
+					<h2 class="margin-bottom-20">ToDo лист</h2>
+					<div class="row">
+						<div class="col-md-8 margin-bottom-10 animate fadeInRight">
+							<%@include file="toDo.jsp" %>
 						</div>
 					</div>
-					
-				</form>
+				</div>
 			</div>
-			<!-- End Main Text -->
 		</div>
 	</div>
-	<!-- End Content -->
-<!-- === BEGIN FOOTER === -->
+	<!-- === END CONTENT === -->
+	<!-- === BEGIN FOOTER === -->
         <div id="base" class="background-dark text-light">
             <div class="container padding-vert-30">
                 <div class="row">
@@ -165,7 +153,7 @@
                 </div>
             </div>
             <!-- End Footer -->
-
+	<!-- JS -->
 	<script type="text/javascript" src="js/jquery.min.js"></script>
 	<script type="text/javascript" src="js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="js/scripts.js"></script>
@@ -189,4 +177,3 @@
 	<!-- End JS -->
 </body>
 </html>
-<!-- === END FOOTER === -->

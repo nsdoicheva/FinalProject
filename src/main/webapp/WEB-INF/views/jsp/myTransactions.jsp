@@ -56,7 +56,7 @@
 				</div>
 				<!-- End Logo -->
 			</div>
-			<!-- Top Menu -->
+		<!-- Top Menu -->
 			<div id="hornav" class="row text-light">
 				<div class="col-md-12">
 					<div class="text-center visible-lg">
@@ -110,25 +110,49 @@
 					</ul>
 				</div>
 				<!-- Main Text -->
-				<label>За сметка: </label>
-				<form method="POST">
-					<div class="row margin-bottom-20">
-						<div class="col-md-6 col-md-offset-0">
-							<select id="account" name="fromIban">
-								<option value="Всички">Всички</option>
-								<c:forEach var="account" items="${myAccounts}">
-									<option value="${account.getIBAN()}">${account.getIBAN()}</option>
-								</c:forEach>
-							</select>
-							<p>
-								<button type="submit" class="btn btn-primary">Изпрати</button>
-							</p>
+
+				<div class="col-md-9">
+					<h2 class="margin-bottom-30">Трансакции</h2>
+					<label>За сметка: </label>
+					<form method="POST">
+						<div class="row margin-bottom-20">
+							<div class="col-md-6 col-md-offset-0">
+								<select id="account" name="fromIban">
+									<option value="Всички">Всички</option>
+									<c:forEach var="account" items="${myAccounts}">
+										<option value="${account.getIBAN()}">${account.getIBAN()}</option>
+									</c:forEach>
+								</select>
+							</div>
 						</div>
-					</div>
-					
-				</form>
+						<p>
+							<button type="submit" class="btn btn-primary">Изпрати</button>
+						</p>
+					</form>
+					<table>
+						<tr>
+							<th>Сума</th>
+							<th>Подател</th>
+							<th>Получател</th>
+							<th>Описание</th>
+							<th>От сметка</th>
+							<th>Към сметка</th>
+						</tr>
+
+						<c:forEach items="${transactions}" var="transaction">
+							<tr>
+								<td>${transaction.sum}</td>
+								<td>${transaction.sender}</td>
+								<td>${transaction.receiver}</td>
+								<td>${transaction.description}</td>
+								<td>${transaction.fromIBAN}</td>
+								<td>${transaction.toIBAN}</td>
+							</tr>
+						</c:forEach>
+					</table>
+				</div>
+				<!-- End Main Text -->
 			</div>
-			<!-- End Main Text -->
 		</div>
 	</div>
 	<!-- End Content -->

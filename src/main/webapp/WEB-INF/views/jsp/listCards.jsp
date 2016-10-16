@@ -11,7 +11,7 @@
 <!--<![endif]-->
 <head>
 <!-- Title -->
-<title>PiggyBank Трансакции</title>
+<title>PiggyBank Моите Карти</title>
 <!-- Meta -->
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <meta name="description" content="">
@@ -103,36 +103,57 @@
 				<!-- Begin Sidebar Menu -->
 				<div class="col-md-3">
 					<ul class="list-group sidebar-nav" id="sidebar-nav">
-						<li class="list-group-item"><a href="transactions.html">Моите
-								трансакции</a></li>
-						<li class="list-group-item"><a href="makeTransaction.html">Нова
-								трансакция</a></li>
+						<li class="list-group-item"><a href="myCards.html">Моите
+								карти</a></li>
+						<li class="list-group-item"><a href="makeCard.html">Нова
+								карта</a></li>
 					</ul>
 				</div>
 				<!-- Main Text -->
-				<label>За сметка: </label>
-				<form method="POST">
-					<div class="row margin-bottom-20">
-						<div class="col-md-6 col-md-offset-0">
-							<select id="account" name="fromIban">
-								<option value="Всички">Всички</option>
-								<c:forEach var="account" items="${myAccounts}">
-									<option value="${account.getIBAN()}">${account.getIBAN()}</option>
-								</c:forEach>
-							</select>
-							<p>
-								<button type="submit" class="btn btn-primary">Изпрати</button>
-							</p>
+
+				<div class="col-md-9">
+					<h2 class="margin-bottom-30">Карти</h2>
+					<label>За сметка: </label>
+					<form method="POST">
+						<div class="row margin-bottom-20">
+							<div class="col-md-6 col-md-offset-0">
+								<select id="account" name="fromIban">
+									<option value="Всички">Всички</option>
+									<c:forEach var="account" items="${myAccounts}">
+										<option value="${account.getIBAN()}">${account.getIBAN()}</option>
+									</c:forEach>
+								</select>
+							</div>
 						</div>
+						<p>
+							<button type="submit" class="btn btn-primary">Изпрати</button>
+							<a href="#" onclick="HTMLtoPDF()">Свали на PDF</a>
+						</p>
+					</form>
+					<div id="HTMLtoPDF">
+						<table>
+							<tr>
+								<th>Номер/Number</th>
+								<th>Тип/Type</th>
+								<th>Сметка/Account</th>
+							</tr>
+
+							<c:forEach items="${cards}" var="card">
+								<tr>
+									<td>${card.number}</td>
+									<td>${card.type}</td>
+									<td>${card.IBAN}</td>
+								</tr>
+							</c:forEach>
+						</table>
 					</div>
-					
-				</form>
+				</div>
+				<!-- End Main Text -->
 			</div>
-			<!-- End Main Text -->
 		</div>
 	</div>
 	<!-- End Content -->
-<!-- === BEGIN FOOTER === -->
+	<!-- === BEGIN FOOTER === -->
         <div id="base" class="background-dark text-light">
             <div class="container padding-vert-30">
                 <div class="row">
@@ -166,6 +187,7 @@
             </div>
             <!-- End Footer -->
 
+
 	<script type="text/javascript" src="js/jquery.min.js"></script>
 	<script type="text/javascript" src="js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="js/scripts.js"></script>
@@ -186,6 +208,10 @@
 	<script type="text/javascript" src="js/slimbox2.js" charset="utf-8"></script>
 	<!-- Modernizr -->
 	<script src="js/modernizr.custom.js" type="text/javascript"></script>
+	<!-- these js files are used for making PDF -->
+	<script src="js/jspdf.js"></script>
+	<script src="js/jquery-2.1.3.js"></script>
+	<script src="js/pdfFromHTML.js"></script>
 	<!-- End JS -->
 </body>
 </html>

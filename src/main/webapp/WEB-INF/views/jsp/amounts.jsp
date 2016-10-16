@@ -1,4 +1,4 @@
-<%@ page contentType="text/html; charset=UTF-8"%>
+<%@ page contentType="text/html; charset=UTF-8" session="false"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
@@ -11,7 +11,7 @@
 <!--<![endif]-->
 <head>
 <!-- Title -->
-<title>PiggyBank Трансакции</title>
+<title>PiggyBank Наличности</title>
 <!-- Meta -->
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <meta name="description" content="">
@@ -19,8 +19,8 @@
 <meta name="viewport"
 	content="width=device-width, initial-scale=1, maximum-scale=1" />
 <!-- Favicon -->
-<link href="favicon.ico" rel="shortcut icon">
-<link rel="icon" href="img/prase.png">
+
+<link rel="icon" src="assets/img/prase.png">
 <!-- Bootstrap Core CSS -->
 <link rel="stylesheet" href="css/bootstrap.css">
 <!-- Template CSS -->
@@ -36,11 +36,7 @@
 	type="text/css" rel="stylesheet">
 </head>
 <body>
-	<%
-		if (request.getSession(false) == null) {
-			response.sendRedirect("login");
-		}
-	%>
+
 	<!-- Header -->
 	<div id="header"
 		style="background-position: 50% 0%; <br />
@@ -103,32 +99,41 @@
 				<!-- Begin Sidebar Menu -->
 				<div class="col-md-3">
 					<ul class="list-group sidebar-nav" id="sidebar-nav">
-						<li class="list-group-item"><a href="transactions.html">Моите
-								трансакции</a></li>
-						<li class="list-group-item"><a href="makeTransaction.html">Нова
-								трансакция</a></li>
+						<li class="list-group-item"><a href="myAccounts.html">Моите
+								сметки</a></li>
+						<li class="list-group-item"><a href="makeAccount.html">Нова
+								сметка</a></li>
+						<li class="list-group-item"><a href="amounts.html">Наличности</a>
+						</li>
 					</ul>
 				</div>
 				<!-- Main Text -->
-				<label>За сметка: </label>
-				<form method="POST">
-					<div class="row margin-bottom-20">
-						<div class="col-md-6 col-md-offset-0">
-							<select id="account" name="fromIban">
-								<option value="Всички">Всички</option>
-								<c:forEach var="account" items="${myAccounts}">
-									<option value="${account.getIBAN()}">${account.getIBAN()}</option>
-								</c:forEach>
-							</select>
-							<p>
-								<button type="submit" class="btn btn-primary">Изпрати</button>
-							</p>
-						</div>
+				<div class="col-md-9">
+					<h2 class="margin-bottom-30">Наличности</h2>
+					<div class="error-message">
+						<c:if test="${not empty errorMessage}">
+							<c:out value="${errorMessage}" />
+						</c:if>
 					</div>
-					
-				</form>
+					<label>За сметка: </label>
+					<form method="POST">
+						<div class="row margin-bottom-20">
+							<div class="col-md-6 col-md-offset-0">
+								<select id="account" name="fromIban">
+									<option value="Всички">Всички</option>
+									<c:forEach var="account" items="${myAccounts}">
+										<option value="${account.getIBAN()}">${account.getIBAN()}</option>
+									</c:forEach>
+								</select>
+							</div>
+						</div>
+						<p>
+							<button type="submit" class="btn btn-primary">Изпрати</button>
+						</p>
+					</form>
+				</div>
+				<!-- End Main Text -->
 			</div>
-			<!-- End Main Text -->
 		</div>
 	</div>
 	<!-- End Content -->

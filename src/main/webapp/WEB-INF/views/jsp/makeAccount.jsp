@@ -1,8 +1,12 @@
 <%@ page contentType="text/html; charset=UTF-8" session="false"%>
-
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-
-
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<!-- === BEGIN HEADER === -->
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
+<!--[if IE 9]> <html lang="en" class="ie9"> <![endif]-->
+<!--[if !IE]><!-->
 <html lang="en">
 <!--<![endif]-->
 <head>
@@ -34,7 +38,7 @@
 <body>
 	<%
 		if (request.getSession(false) == null) {
-			response.sendRedirect("login.jsp");
+			response.sendRedirect("login");
 		}
 	%>
 	<!-- Header -->
@@ -53,6 +57,7 @@
 				<!-- End Logo -->
 			</div>
 			<!-- Top Menu -->
+			<!-- Top Menu -->
 			<div id="hornav" class="row text-light">
 				<div class="col-md-12">
 					<div class="text-center visible-lg">
@@ -62,6 +67,8 @@
 								<ul>
 									<li><a href="personalInfo.html">Лична информация</a></li>
 									<li><a href="changePassword.html">Смяна на паролата</a></li>
+									<li><a href="toDoList.html">ToDo лист</a></li>
+									<li><a href="logout.html">Изход</a></li>
 								</ul></li>
 							<li><span class="fa-copy ">ТРАНСАКЦИИ</span>
 								<ul>
@@ -71,14 +78,15 @@
 							<li><span class="fa-th ">КАРТИ</span>
 								<ul>
 									<li><a href="myCards.html">Моите карти</a></li>
-									<li><a href="createCard.html">Направи нова карта</a></li>
+									<li><a href="makeCard.html">Направи нова карта</a></li>
 								</ul></li>
 							<li><span class="fa-font ">СМЕТКИ</span>
 								<ul>
 									<li><a href="myAccounts.html">Моите сметки</a></li>
 									<li><a href="makeAccount.html">Направи нова сметка</a></li>
+									<li><a href="amounts.html">Наличности</a></li>
 								</ul></li>
-							<li><a href="contact.html" class="fa-comment ">КОНТАКТИ</a>
+							<li><a href="contactLogged.html" class="fa-comment ">КОНТАКТИ</a>
 							</li>
 						</ul>
 					</div>
@@ -100,12 +108,13 @@
 								сметки</a></li>
 						<li class="list-group-item"><a href="makeAccount.html">Нова
 								сметка</a></li>
+						<li class="list-group-item"><a href="amounts.html">Наличности</a></li>
 					</ul>
 				</div>
 				<!-- Main Text -->
 				<div class="col-md-9">
 					<h2 class="margin-bottom-30">Нова сметка</h2>
-					<div style="color: red;">
+					<div class="error-message">
 						<c:if test="${not empty errorMessage}">
 							<c:out value="${errorMessage}" />
 						</c:if>
@@ -115,7 +124,7 @@
 						<div class="row margin-bottom-20">
 							<div class="col-md-6 col-md-offset-0">
 								<input class="form-control" type="text" name="name"
-									required="required" data-validation="alphanumeric" data-validation-length="min3">
+									required="required">
 							</div>
 						</div>
 						<label>Тип: </label>
@@ -142,7 +151,7 @@
 						<div class="row margin-bottom-20">
 							<div class="col-md-6 col-md-offset-0">
 								<input class="form-control" type="number" name="sum"
-									required="required" data-validation="number" data-validation-ignore="$">
+									required="required">
 							</div>
 						</div>
 						<p>
@@ -155,37 +164,56 @@
 		</div>
 	</div>
 	<!-- End Content -->
+	<!-- === BEGIN FOOTER === -->
+	<div id="base" class="background-dark text-light">
+		<div class="container padding-vert-30">
+			<div class="row"></div>
+		</div>
+	</div>
+	<!-- Footer -->
+	<div id="footer" class="background-dark text-light">
+		<div class="container no-padding">
+			<div class="row">
+				<!-- Footer Menu -->
+				<div id="footermenu" class="col-md-8">
+					<ul class="list-unstyled list-inline">
+						<li><a href="index.html">Начало</a></li>
+						<li><a href="contactLogged.html">Контакти</a></li>
+
+					</ul>
+				</div>
+				<!-- End Footer Menu -->
+				<!-- Copyright -->
+				<div id="copyright" class="col-md-4">
+					<p class="pull-right">(c) 2016 PiggyBank Online</p>
+				</div>
+				<!-- End Copyright -->
+			</div>
+		</div>
+		<!-- End Footer -->
 
 
-	<script type="text/javascript" src="js/jquery.min.js"></script>
-	<script type="text/javascript" src="js/bootstrap.min.js"></script>
-	<script type="text/javascript" src="js/scripts.js"></script>
-	<!-- Isotope - Portfolio Sorting -->
-	<script type="text/javascript" src="js/jquery.isotope.js"></script>
-	<!-- Mobile Menu - Slicknav -->
-	<script type="text/javascript" src="js/jquery.slicknav.js"></script>
-	<!-- Animate on Scroll-->
-	<script type="text/javascript" src="js/jquery.visible.js"
-		charset="utf-8"></script>
-	<!-- Stellar Parallax -->
-	<script type="text/javascript" src="js/jquery.stellar.js"
-		charset="utf-8"></script>
-	<!-- Sticky Div -->
-	<script type="text/javascript" src="js/jquery.sticky.js"
-		charset="utf-8"></script>
-	<!-- Slimbox2-->
-	<script type="text/javascript" src="js/slimbox2.js" charset="utf-8"></script>
-	<!-- Modernizr -->
-	<script src="js/modernizr.custom.js" type="text/javascript"></script>
-	<!-- End JS -->
-	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-	<script
-		src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-	<script
-		src="https://cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.3.26/jquery.form-validator.min.js"></script>
-	<script>
-		$.validate();
-	</script>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script type="text/javascript" src="js/bootstrap.min.js"></script>
+		<script type="text/javascript" src="js/scripts.js"></script>
+		<!-- Isotope - Portfolio Sorting -->
+		<script type="text/javascript" src="js/jquery.isotope.js"></script>
+		<!-- Mobile Menu - Slicknav -->
+		<script type="text/javascript" src="js/jquery.slicknav.js"></script>
+		<!-- Animate on Scroll-->
+		<script type="text/javascript" src="js/jquery.visible.js"
+			charset="utf-8"></script>
+		<!-- Stellar Parallax -->
+		<script type="text/javascript" src="js/jquery.stellar.js"
+			charset="utf-8"></script>
+		<!-- Sticky Div -->
+		<script type="text/javascript" src="js/jquery.sticky.js"
+			charset="utf-8"></script>
+		<!-- Slimbox2-->
+		<script type="text/javascript" src="js/slimbox2.js" charset="utf-8"></script>
+		<!-- Modernizr -->
+		<script src="js/modernizr.custom.js" type="text/javascript"></script>
+		<!-- End JS -->
 </body>
 </html>
 <!-- === END FOOTER === -->

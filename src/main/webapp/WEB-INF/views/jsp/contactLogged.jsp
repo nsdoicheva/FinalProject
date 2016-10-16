@@ -47,7 +47,7 @@ input[type=password] {
 }
 /* Set a style for all buttons */
 button {
-	background-color: #4CAF50;
+	background-color: #394046;
 	color: white;
 	padding: 14px 20px;
 	margin: 8px 0;
@@ -84,6 +84,48 @@ span.psw {
 	float: right;
 	padding-top: 16px;
 }
+
+p.greetings {
+font-size: 16px;
+
+}
+
+#sendbutton {
+/*basic styles*/
+	width: 250px;  height: 50px;  color: #fff; background-color: #125182;
+	text-align: center;  font-size: 30px;  line-height: 50px;
+	
+	
+	/*gradient styles*/
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #125182), color-stop(.5, #1269ab), color-stop(.51, #004375), to(#00345b));
+	background: -moz-linear-gradient(top, #125182, #1269ab 50%, #004375 51%, #00345b);  
+	
+	/*border styles*/
+	-moz-border-radius: 30px;
+	-webkit-border-radius: 30px;
+	border-radius: 30px;
+	
+	-moz-box-shadow:inset 0 0 10px #000000;
+	-webkit-box-shadow:inset 0 0 10px #000000;
+	box-shadow:inset 0 0 10px #000000;
+
+}
+
+
+#sendbutton:hover {
+	-moz-box-shadow:inset 0 0 50px #000000;
+	-webkit-box-shadow:inset 0 0 50px #000000;
+	box-shadow:inset 0 0 50px #000000;
+}
+
+#pbtn {
+font-size: 20px;
+	line-height: 50px;
+	font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+	font-weight: 300;
+	text-shadow: 0px 0px 3px #555;
+	margin-top: -13px;
+ }
 
 /* The Modal (background) */
 .modal {
@@ -181,7 +223,7 @@ window.onclick = function(event) {
 <body>
 <%
 		if (request.getSession(false)== null) {
-			response.sendRedirect("contact.jsp");
+			response.sendRedirect("contact");
 		}
 	%>
 	<!-- Header -->
@@ -202,63 +244,39 @@ window.onclick = function(event) {
 			</div>
 			<!-- Top Menu -->
 			<div id="hornav" class="row text-light">
-                    <div class="col-md-12">
-                        <div class="text-center visible-lg">
-                            <ul id="hornavmenu" class="nav navbar-nav">
-                                <li>
-                                    <a href="index.html" class="fa-home active">НАЧАО</a>
-                                </li>
-                                <li>
-                                    <span class="fa-gears ">ПРОФИЛ</span>
-                                    <ul>
-                                        <li>
-                                            <a href="personalInfo.html">Лична информация</a>
-                                        </li>
-                                        <li>
-                                            <a href="changePassword.html">Смяна на паролата</a>
-                                        </li>
-                                    </ul>
-                                </li>
-                                <li>
-                                    <span class="fa-copy ">ТРАНСАКЦИИ</span>
-                                    <ul>
-                                        <li>
-                                            <a href="transactions.html">Моите трансакции</a>
-                                        </li>
-                                        <li>
-                                            <a href="makeTransaction.html">Нова трансакция</a>
-                                        </li>
-                                    </ul>
-                                </li>
-                                <li>
-                                    <span class="fa-th ">КАРТИ</span>
-                                    <ul>
-                                        <li>
-                                            <a href="myCards.html">Моите карти</a>
-                                        </li>
-                                        <li>
-                                            <a href="createCard.html">Направи нова карта</a>
-                                        </li>
-                                    </ul>
-                                </li>
-                                <li>
-                                    <span class="fa-font ">СМЕТКИ</span>
-                                    <ul>
-                                        <li>
-                                            <a href="myAccounts.html">Моите сметки</a>
-                                        </li>
-                                        <li>
-                                            <a href="makeAccount.html">Направи нова сметка</a>
-                                        </li>
-                                    </ul>
-                                </li>
-                                <li>
-                                    <a href="contactLogged.html" class="fa-comment ">КОНТАКТИ</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+				<div class="col-md-12">
+					<div class="text-center visible-lg">
+						<ul id="hornavmenu" class="nav navbar-nav">
+							<li><a href="index.html" class="fa-home active">НАЧАО</a></li>
+							<li><span class="fa-gears ">ПРОФИЛ</span>
+								<ul>
+									<li><a href="personalInfo.html">Лична информация</a></li>
+									<li><a href="changePassword.html">Смяна на паролата</a></li>
+									<li><a href="toDoList.html">ToDo лист</a></li>
+									<li><a href="logout.html">Изход</a></li>
+								</ul></li>
+							<li><span class="fa-copy ">ТРАНСАКЦИИ</span>
+								<ul>
+									<li><a href="transactions.html">Моите трансакции</a></li>
+									<li><a href="makeTransaction.html">Нова трансакция</a></li>
+								</ul></li>
+							<li><span class="fa-th ">КАРТИ</span>
+								<ul>
+									<li><a href="myCards.html">Моите карти</a></li>
+									<li><a href="makeCard.html">Направи нова карта</a></li>
+								</ul></li>
+							<li><span class="fa-font ">СМЕТКИ</span>
+								<ul>
+									<li><a href="myAccounts.html">Моите сметки</a></li>
+									<li><a href="makeAccount.html">Направи нова сметка</a></li>
+									<li><a href="amounts.html">Наличности</a></li>
+								</ul></li>
+							<li><a href="contactLogged.html" class="fa-comment ">КОНТАКТИ</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
 			<!-- End Top Menu -->
 		</div>
 	</div>
@@ -274,36 +292,36 @@ window.onclick = function(event) {
 					<div class="headline">
 						<h2 class="margin-bottom-20">Форма за контакт</h2>
 					</div>
-					<p>Използвайте формата за контакт за да изпратите вашето
-						съобщение.</p>
+					<p class="greetings">Използвайте формата ни за контакт, за да изпратите бързо и лесно своето съобщение.</p>
+					<p class="greetings">Обратната връзка е от голямо значение за нас, за да подобрим услугите, които предлагаме!</p>
 					<br>
 					<!-- Contact Form -->
 
-					<h2>Пишете ни!</h2>
-
-					<button
+					<button id="sendbutton"
 						onclick="document.getElementById('id01').style.display='block'"
-						style="width: auto;">Николина</button>
+						style="width: auto;"> <p id="pbtn"> Изпрати съобщение <p> </button>
 
 					<div id="id01" class="modal">
 
-						<form class="modal-content animate">
+						<form class="modal-content animate" method = "POST">
 							<div class="imgcontainer">
 								<span
 									onclick="document.getElementById('id01').style.display='none'"
 									class="close" title="Close Modal">&times;</span> <img
-									src="img/nikolina.jpg" alt="Avatar" class="avatar">
+									src="img/admins.png" alt="Avatar" class="avatar">
 							</div>
 
 							<div class="container">
-								<label style="margin-right: 8px;"><b>Име</b></label> <input
-									type="text" placeholder="" name="name" required> <label
-									style="margin-left: 25px;" ><b>E-mail</b></label>
-								<input type="text" placeholder="" name="email" required>
+								<label style="margin-right: 8px;"><b>Име</b></label> 
+								<input	type="text" placeholder="" name="name" required data-validation="length" data-validation-length="3-20"> 
+									
+								<label style="margin-left: 25px;" ><b>E-mail</b></label>
+								<input type="text" placeholder="" name="email" data-validation="email" required>
 
 								<label style="margin-left: 4px; margin-right: 10px;"><b>Съобщение</b></label>
-								<textarea rows="3" cols="50"> </textarea>
-
+								<textarea rows="3" cols="50" id="the-textarea" name="text"> </textarea>
+                                <span id="max-length-element">151</span> chars left
+                                 
 								<button type="submit" style="margin-left: 200px;">Изпрати</button>
 
 							</div>
@@ -364,8 +382,38 @@ window.onclick = function(event) {
 	</div>
 	<!-- === END CONTENT === -->
 	<!-- === BEGIN FOOTER === -->
-	<!-- Footer -->
-	<!-- End Footer -->
+        <div id="base" class="background-dark text-light">
+            <div class="container padding-vert-30">
+                <div class="row">
+                    
+                </div>
+            </div>
+        </div>
+          <!-- Footer -->
+        <div id="footer" class="background-dark text-light">
+            <div class="container no-padding">
+                <div class="row">
+                    <!-- Footer Menu -->
+                    <div id="footermenu" class="col-md-8">
+                        <ul class="list-unstyled list-inline">
+                            <li>
+                                <a href="index.html">Начало</a>
+                            </li>
+                            <li>
+                                <a href="contactLogged.html">Контакти</a>
+                            </li>
+                           
+                        </ul>
+                    </div>
+                    <!-- End Footer Menu -->
+                    <!-- Copyright -->
+                    <div id="copyright" class="col-md-4">
+                        <p class="pull-right">(c) 2016 PiggyBank Online</p>
+                    </div>
+                    <!-- End Copyright -->
+                </div>
+            </div>
+            <!-- End Footer -->
 	<!-- JS -->
 	<script type="text/javascript" src="js/jquery.min.js"></script>
 	<script type="text/javascript" src="js/bootstrap.min.js"></script>

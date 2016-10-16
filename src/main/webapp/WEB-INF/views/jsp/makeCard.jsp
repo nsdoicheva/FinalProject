@@ -1,4 +1,4 @@
-<%@ page contentType="text/html; charset=UTF-8"%>
+<%@ page contentType="text/html; charset=UTF-8" session="false"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
@@ -11,7 +11,7 @@
 <!--<![endif]-->
 <head>
 <!-- Title -->
-<title>PiggyBank Трансакции</title>
+<title>PiggyBank Нова карта</title>
 <!-- Meta -->
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <meta name="description" content="">
@@ -56,7 +56,7 @@
 				</div>
 				<!-- End Logo -->
 			</div>
-			<!-- Top Menu -->
+		<!-- Top Menu -->
 			<div id="hornav" class="row text-light">
 				<div class="col-md-12">
 					<div class="text-center visible-lg">
@@ -103,32 +103,53 @@
 				<!-- Begin Sidebar Menu -->
 				<div class="col-md-3">
 					<ul class="list-group sidebar-nav" id="sidebar-nav">
-						<li class="list-group-item"><a href="transactions.html">Моите
-								трансакции</a></li>
-						<li class="list-group-item"><a href="makeTransaction.html">Нова
-								трансакция</a></li>
+						<li class="list-group-item"><a href="myCards.html">Моите
+								карти</a></li>
+						<li class="list-group-item"><a href="makeCard.html">Нова
+								карта</a></li>
 					</ul>
 				</div>
 				<!-- Main Text -->
-				<label>За сметка: </label>
-				<form method="POST">
-					<div class="row margin-bottom-20">
-						<div class="col-md-6 col-md-offset-0">
-							<select id="account" name="fromIban">
-								<option value="Всички">Всички</option>
-								<c:forEach var="account" items="${myAccounts}">
-									<option value="${account.getIBAN()}">${account.getIBAN()}</option>
-								</c:forEach>
-							</select>
-							<p>
-								<button type="submit" class="btn btn-primary">Изпрати</button>
-							</p>
-						</div>
+				<div class="col-md-9">
+					<h2 class="margin-bottom-30">Нова карта</h2>
+					<div class="error-message">
+						<c:if test="${not empty errorMessage}">
+							<c:out value="${errorMessage}" />
+						</c:if>
 					</div>
-					
-				</form>
+					<div class="success-message">
+						<c:if test="${not empty successMessage}">
+							<c:out value="${successMessage}" />
+						</c:if>
+					</div>
+					<form method="post">
+						<label>Тип: </label>
+						<div class="row margin-bottom-20">
+							<div class="col-md-6 col-md-offset-0">
+								<select name="type">
+									<c:forEach var="type" items="${cardTypes}">
+										<option value="${type}">${type}</option>
+									</c:forEach>
+								</select>
+							</div>
+						</div>
+						<label>Към сметка: </label>
+						<div class="row margin-bottom-20">
+							<div class="col-md-6 col-md-offset-0">
+								<select id="account" name="fromIban">
+									<c:forEach var="account" items="${myAccounts}">
+										<option value="${account.getIBAN()}">${account.getIBAN()}</option>
+									</c:forEach>
+								</select>
+							</div>
+						</div>
+						<p>
+							<button type="submit" class="btn btn-primary">Направи</button>
+						</p>
+					</form>
+				</div>
+				<!-- End Main Text -->
 			</div>
-			<!-- End Main Text -->
 		</div>
 	</div>
 	<!-- End Content -->

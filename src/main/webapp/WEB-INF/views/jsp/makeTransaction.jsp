@@ -40,7 +40,7 @@
 <body>
 	<%
 		if (request.getSession(false)== null) {
-			response.sendRedirect("login.jsp");
+			response.sendRedirect("login");
 		}
 	%>
 	<!-- Header -->
@@ -66,8 +66,10 @@
 							<li><a href="index.html" class="fa-home active">НАЧАО</a></li>
 							<li><span class="fa-gears ">ПРОФИЛ</span>
 								<ul>
-									<li class="parent"><span>Лична информация</span></li>
-									<li class="parent"><span>Смяна на паролата</span></li>
+									<li><a href="personalInfo.html">Лична информация</a></li>
+									<li><a href="changePassword.html">Смяна на паролата</a></li>
+									<li><a href="toDoList.html">ToDo лист</a></li>
+									<li><a href="logout.html">Изход</a></li>
 								</ul></li>
 							<li><span class="fa-copy ">ТРАНСАКЦИИ</span>
 								<ul>
@@ -77,12 +79,13 @@
 							<li><span class="fa-th ">КАРТИ</span>
 								<ul>
 									<li><a href="myCards.html">Моите карти</a></li>
-									<li><a href="createCard.html">Направи нова карта</a></li>
+									<li><a href="makeCard.html">Направи нова карта</a></li>
 								</ul></li>
 							<li><span class="fa-font ">СМЕТКИ</span>
 								<ul>
 									<li><a href="myAccounts.html">Моите сметки</a></li>
 									<li><a href="makeAccount.html">Направи нова сметка</a></li>
+									<li><a href="amounts.html">Наличности</a></li>
 								</ul></li>
 							<li><a href="contactLogged.html" class="fa-comment ">КОНТАКТИ</a>
 							</li>
@@ -111,12 +114,12 @@
 				<!-- Main Text -->
 				<div class="col-md-9">
 				<h2 class="margin-bottom-30">Нова трансакция</h2>
-					<div style="color: red;">
+					<div class="error-message">
 						<c:if test="${not empty errorMessage}">
 							<c:out value="${errorMessage}" />
 						</c:if>
 					</div>
-					<div style="color: green;">
+					<div class="success-message">
 						<c:if test="${not empty successMessage}">
 							<c:out value="${successMessage}" />
 						</c:if>
@@ -136,21 +139,21 @@
 						<div class="row margin-bottom-20">
 							<div class="col-md-6 col-md-offset-0">
 								<input class="form-control" type="text" name="toIban"
-									required="required" data-validation="alphanumeric" >
+									required="required">
 							</div>
 						</div>
 						<label>Сума: </label>
 						<div class="row margin-bottom-20">
 							<div class="col-md-6 col-md-offset-0">
 								<input class="form-control" type="number" name="sum"
-									required="required" data-validation="number" data-validation-ignore="$">
+									required="required">
 							</div>
 						</div>
 						<label>Описание:</label>
 						<div class="row margin-bottom-20">
 							<div class="col-md-8 col-md-offset-0">
 								<textarea name="description" rows="8" class="form-control"
-									required="required" ></textarea>
+									required="required"></textarea>
 							</div>
 						</div>
 						<p>
@@ -163,7 +166,39 @@
 		</div>
 	</div>
 	<!-- End Content -->
-
+<!-- === BEGIN FOOTER === -->
+        <div id="base" class="background-dark text-light">
+            <div class="container padding-vert-30">
+                <div class="row">
+                    
+                </div>
+            </div>
+        </div>
+          <!-- Footer -->
+        <div id="footer" class="background-dark text-light">
+            <div class="container no-padding">
+                <div class="row">
+                    <!-- Footer Menu -->
+                    <div id="footermenu" class="col-md-8">
+                        <ul class="list-unstyled list-inline">
+                            <li>
+                                <a href="index.html">Начало</a>
+                            </li>
+                            <li>
+                                <a href="contactLogged.html">Контакти</a>
+                            </li>
+                           
+                        </ul>
+                    </div>
+                    <!-- End Footer Menu -->
+                    <!-- Copyright -->
+                    <div id="copyright" class="col-md-4">
+                        <p class="pull-right">(c) 2016 PiggyBank Online</p>
+                    </div>
+                    <!-- End Copyright -->
+                </div>
+            </div>
+            <!-- End Footer -->
 
 	<script type="text/javascript" src="js/jquery.min.js"></script>
 	<script type="text/javascript" src="js/bootstrap.min.js"></script>
@@ -186,14 +221,6 @@
 	<!-- Modernizr -->
 	<script src="js/modernizr.custom.js" type="text/javascript"></script>
 	<!-- End JS -->
-	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-	<script
-		src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-	<script
-		src="https://cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.3.26/jquery.form-validator.min.js"></script>
-	<script>
-		$.validate();
-	</script>
 </body>
 </html>
 <!-- === END FOOTER === -->

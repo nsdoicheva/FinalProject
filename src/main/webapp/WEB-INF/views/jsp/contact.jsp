@@ -24,6 +24,7 @@
 <link rel="stylesheet" href="css/nexus.css">
 <link rel="stylesheet" href="css/responsive.css">
 <link rel="stylesheet" href="css/custom.css">
+
 <style>
 /* Full-width input fields */
 input[type=text] {
@@ -47,7 +48,7 @@ input[type=password] {
 }
 /* Set a style for all buttons */
 button {
-	background-color: #4CAF50;
+	background-color: #394046;
 	color: white;
 	padding: 14px 20px;
 	margin: 8px 0;
@@ -84,6 +85,48 @@ span.psw {
 	float: right;
 	padding-top: 16px;
 }
+
+p.greetings {
+font-size: 16px;
+
+}
+
+#sendbutton {
+/*basic styles*/
+	width: 250px;  height: 50px;  color: #fff; background-color: #125182;
+	text-align: center;  font-size: 30px;  line-height: 50px;
+	
+	
+	/*gradient styles*/
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #125182), color-stop(.5, #1269ab), color-stop(.51, #004375), to(#00345b));
+	background: -moz-linear-gradient(top, #125182, #1269ab 50%, #004375 51%, #00345b);  
+	
+	/*border styles*/
+	-moz-border-radius: 30px;
+	-webkit-border-radius: 30px;
+	border-radius: 30px;
+	
+	-moz-box-shadow:inset 0 0 10px #000000;
+	-webkit-box-shadow:inset 0 0 10px #000000;
+	box-shadow:inset 0 0 10px #000000;
+
+}
+
+
+#sendbutton:hover {
+	-moz-box-shadow:inset 0 0 50px #000000;
+	-webkit-box-shadow:inset 0 0 50px #000000;
+	box-shadow:inset 0 0 50px #000000;
+}
+
+#pbtn {
+font-size: 20px;
+	line-height: 50px;
+	font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+	font-weight: 300;
+	text-shadow: 0px 0px 3px #555;
+	margin-top: -13px;
+ }
 
 /* The Modal (background) */
 .modal {
@@ -163,14 +206,14 @@ to {
 }
 </style>
 <script>
-	// Get the modal
-	var modal = document.getElementById('id01');
+// Get the modal
+var modal = document.getElementById('id01');
 
-	window.onclick = function(event) {
-		if (event.target == modal) {
-			modal.style.display = "none";
-		}
-	}
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
 </script>
 <!-- Google Fonts-->
 <link href="http://fonts.googleapis.com/css?family=Raleway:100,300,400"
@@ -179,11 +222,6 @@ to {
 	type="text/css" rel="stylesheet">
 </head>
 <body>
-	<%
-		if (request.getSession(false)!= null) {
-			response.sendRedirect("contactLogged.jsp");
-		}
-	%>
 	<!-- Header -->
 	<div id="header"
 		style="background-position: 50% 0%; <br />
@@ -227,35 +265,36 @@ to {
 					<div class="headline">
 						<h2 class="margin-bottom-20">Форма за контакт</h2>
 					</div>
-					<p>Използвайте формата за контакт за да изпратите вашето
-						съобщение.</p>
+					<p class="greetings">Използвайте формата ни за контакт, за да изпратите бързо и лесно своето съобщение.</p>
+					<p class="greetings">Обратната връзка е от голямо значение за нас, за да подобрим услугите, които предлагаме!</p>
 					<br>
 					<!-- Contact Form -->
 
-					<h2>Пишете ни!</h2>
-
-					<button
+					<button id="sendbutton"
 						onclick="document.getElementById('id01').style.display='block'"
-						style="width: auto;">Николина</button>
+						style="width: auto;"> <p id="pbtn"> Изпрати съобщение <p> </button>
 
 					<div id="id01" class="modal">
 
-						<form class="modal-content animate">
+						<form class="modal-content animate" method = "POST">
 							<div class="imgcontainer">
 								<span
 									onclick="document.getElementById('id01').style.display='none'"
 									class="close" title="Close Modal">&times;</span> <img
-									src="img/nikolina.jpg" alt="Avatar" class="avatar">
+									src="img/admins.png" alt="Avatar" class="avatar">
 							</div>
 
 							<div class="container">
-								<label style="margin-right: 8px;"><b>Име</b></label> <input
-									type="text" placeholder="" name="name" required> <label
-									style="margin-left: 25px;"><b>E-mail</b></label> <input
-									type="text" placeholder="" name="email" required> <label
-									style="margin-left: 4px; margin-right: 10px;"><b>Съобщение</b></label>
-								<textarea rows="3" cols="50"> </textarea>
+								<label style="margin-right: 8px;"><b>Име</b></label> 
+								<input	type="text" placeholder="" name="name" required data-validation="length" data-validation-length="3-20"> 
+									
+								<label style="margin-left: 25px;" ><b>E-mail</b></label>
+								<input type="text" placeholder="" name="email" data-validation="email" required>
 
+								<label style="margin-left: 4px; margin-right: 10px;"><b>Съобщение</b></label>
+								<textarea rows="3" cols="50" id="the-textarea" name="text"> </textarea>
+                                <span id="max-length-element">151</span> chars left
+                                 
 								<button type="submit" style="margin-left: 200px;">Изпрати</button>
 
 							</div>
@@ -316,8 +355,38 @@ to {
 	</div>
 	<!-- === END CONTENT === -->
 	<!-- === BEGIN FOOTER === -->
-	<!-- Footer -->
-	<!-- End Footer -->
+        <div id="base" class="background-dark text-light">
+            <div class="container padding-vert-30">
+                <div class="row">
+                    
+                </div>
+            </div>
+        </div>
+          <!-- Footer -->
+        <div id="footer" class="background-dark text-light">
+            <div class="container no-padding">
+                <div class="row">
+                    <!-- Footer Menu -->
+                    <div id="footermenu" class="col-md-8">
+                        <ul class="list-unstyled list-inline">
+                            <li>
+                                <a href="index.html">Начало</a>
+                            </li>
+                            <li>
+                                <a href="contactLogged.html">Контакти</a>
+                            </li>
+                           
+                        </ul>
+                    </div>
+                    <!-- End Footer Menu -->
+                    <!-- Copyright -->
+                    <div id="copyright" class="col-md-4">
+                        <p class="pull-right">(c) 2016 PiggyBank Online</p>
+                    </div>
+                    <!-- End Copyright -->
+                </div>
+            </div>
+            <!-- End Footer -->
 	<!-- JS -->
 	<script type="text/javascript" src="js/jquery.min.js"></script>
 	<script type="text/javascript" src="js/bootstrap.min.js"></script>
@@ -340,5 +409,11 @@ to {
 	<!-- Modernizr -->
 	<script src="js/modernizr.custom.js" type="text/javascript"></script>
 	<!-- End JS -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.3.26/jquery.form-validator.min.js"></script>
+<script >
+  $.validate();
+  $('#the-textarea').restrictLength( $('#max-length-element') );
+</script>
 </body>
 </html>
