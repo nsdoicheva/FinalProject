@@ -14,6 +14,7 @@ import org.springframework.test.context.ContextConfiguration;
 
 import bg.piggybank.model.exeptions.*;
 import bg.piggybank.model.BasicInfo;
+import bg.piggybank.model.cards.Card;
 import bg.piggybank.model.configurations.Config;
 
 @ContextConfiguration(classes= Config.class)
@@ -23,7 +24,6 @@ public class Account extends BasicInfo {
 	private String IBAN;
 	private AccountType type;
 	private CurrencyType currency;
-	private List<Card> cards = new ArrayList<Card>();
 
 	public Account(String name, AccountType type, CurrencyType currency, double sum) {
 		super(sum);
@@ -53,18 +53,6 @@ public class Account extends BasicInfo {
 	public Account(String name, String IBAN, AccountType type, CurrencyType currency, double sum) {
 		this(name, type, currency, sum);
 		this.IBAN=IBAN;
-	}
-
-	public List<Card> getCards() {
-		return Collections.unmodifiableList(this.cards);
-	}
-
-	public void addCard(Card card) {
-		if (card != null) {
-			this.cards.add(card);
-		} else {
-			System.out.println("Card doesn't exist");
-		}
 	}
 
 	private boolean isValidType(Object type) {
