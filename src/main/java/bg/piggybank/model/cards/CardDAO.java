@@ -14,24 +14,26 @@ import bg.piggybank.model.Checkers;
 import bg.piggybank.model.Constants;
 import bg.piggybank.model.DBConnection;
 import bg.piggybank.model.accounts.Account;
-import bg.piggybank.model.accounts.AccountDAO;
-import bg.piggybank.model.accounts.CurrencyType;
+import bg.piggybank.model.accounts.IAccountDAO;
 import bg.piggybank.model.exeptions.AccountException;
 import bg.piggybank.model.exeptions.CardException;
 import bg.piggybank.model.exeptions.FailedConnectionException;
 import bg.piggybank.model.exeptions.GeneratorException;
 
 @Component
-public class CardDAO implements ICard {
+public class CardDAO implements ICardDAO {
 	
 	@Autowired
-	private AccountDAO accountDao;
+	private IAccountDAO accountDao;
 	private static final String CHECK_FOR_CARD = "SELECT id FROM cards WHERE number LIKE (?)";
 	private static final String ADD_NEW_CARD = "INSERT INTO cards (id, number, type, account_id) VALUES (null, ?, ?, ?);";
 	private static final String GET_ALL_CARDS_FOR_ACCOUNT = "SELECT id, number, type, account_id FROM cards WHERE account_id = (?);	";
 	private static final String GET_ALL_CARDS_FOR_USER = "SELECT c.id, c.number, c.type, c.account_id FROM cards c JOIN accounts a "
 			+ " ON c.account_id=a.id JOIN users u ON a.users_id=u.id WHERE username=?; ";
 
+	/* (non-Javadoc)
+	 * @see bg.piggybank.model.cards.ICardDAO#createCardForAccount(bg.piggybank.model.accounts.Account, bg.piggybank.model.cards.CardTypes)
+	 */
 	@Override
 	public void createCardForAccount(Account account, CardTypes type) throws AccountException, CardException {
 		if (account == null) {
@@ -118,6 +120,9 @@ public class CardDAO implements ICard {
 		return cardNumber;
 	}
 
+	/* (non-Javadoc)
+	 * @see bg.piggybank.model.cards.ICardDAO#getAllCardsForAccount(bg.piggybank.model.accounts.Account)
+	 */
 	@Override
 	public List<Card> getAllCardsForAccount(Account account) throws CardException, AccountException {
 		if (account == null) {
@@ -139,6 +144,7 @@ public class CardDAO implements ICard {
 				CardTypes type = getCardType(allCards.getString("type"));
 				Card card = new Card(type, cardNumber);
 				card.setIBAN(account.getIBAN());
+				card.setID(cardID);
 				accountCards.add(card);
 			}
 		} catch (FailedConnectionException e) {
@@ -149,6 +155,10 @@ public class CardDAO implements ICard {
 		return accountCards;
 	}
 	
+	/* (non-Javadoc)
+	 * @see bg.piggybank.model.cards.ICardDAO#getAllCardsForUser(java.lang.String)
+	 */
+	@Override
 	public List<Card> getAllCardsForUser(String username) throws CardException, AccountException {
 		if (username== null || username.trim().equals("")) {
 			throw new AccountException("No such account found!");
@@ -168,6 +178,7 @@ public class CardDAO implements ICard {
 				int accountId= allCards.getInt("account_id");
 				Account account= accountDao.getAccountByID(accountId, connection);
 				card.setIBAN(account.getIBAN());
+				card.setID(cardID);
 				userCards.add(card);
 			}
 		} catch (FailedConnectionException e) {
@@ -178,6 +189,10 @@ public class CardDAO implements ICard {
 		return userCards;
 	}
 
+	/* (non-Javadoc)
+	 * @see bg.piggybank.model.cards.ICardDAO#getCardType(java.lang.String)
+	 */
+	@Override
 	public CardTypes getCardType(String type) {
 		CardTypes cardType = null;
 		CardTypes[] cards = CardTypes.values();
@@ -189,6 +204,10 @@ public class CardDAO implements ICard {
 		return cardType;
 	}
 
+	/* (non-Javadoc)
+	 * @see bg.piggybank.model.cards.ICardDAO#getAllCardTypes()
+	 */
+	@Override
 	public List<String> getAllCardTypes() {
 		List<String> cards = new ArrayList<String>();
 		for (CardTypes type : CardTypes.values()) {
