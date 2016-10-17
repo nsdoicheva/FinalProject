@@ -21,7 +21,7 @@ import bg.piggybank.model.PasswordGenerator;
 import bg.piggybank.model.exeptions.*;
 
 @Component
-public class UserDAO {
+public class UserDAO implements IUserDAO {
 
 	private static final String CAPITAL_LETTER = "A";
 	private static final String INSERT_INTO_COUNTRIES = "INSERT INTO countries VALUES(null,?);";
@@ -46,6 +46,10 @@ public class UserDAO {
 	private static final String SELECT_USERS_PASSWORD = "SELECT password FROM users WHERE password=? AND id=?;";
 	private static List<User> users = Collections.synchronizedList(new ArrayList<User>());
 
+	/* (non-Javadoc)
+	 * @see bg.piggybank.model.user.IUserDAO#saveUserAddress(java.lang.String, java.lang.String, java.lang.String)
+	 */
+	@Override
 	public int saveUserAddress(String address, String city, String country) {
 		int id = 0;
 		Connection connection = null;
@@ -86,6 +90,10 @@ public class UserDAO {
 		return id;
 	}
 
+	/* (non-Javadoc)
+	 * @see bg.piggybank.model.user.IUserDAO#loginUser(java.lang.String, java.lang.String)
+	 */
+	@Override
 	public boolean loginUser(String username, String password) {
 		Connection connection = null;
 		try {
@@ -109,6 +117,10 @@ public class UserDAO {
 		return true;
 	}
 
+	/* (non-Javadoc)
+	 * @see bg.piggybank.model.user.IUserDAO#getAllUsersFromDB()
+	 */
+	@Override
 	public Set<User> getAllUsersFromDB() {
 		Set<User> users = new TreeSet<User>();
 		try {
@@ -140,6 +152,10 @@ public class UserDAO {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see bg.piggybank.model.user.IUserDAO#saveUser(bg.piggybank.model.user.User)
+	 */
+	@Override
 	public int saveUser(User user) {
 		int userId = 0;
 		if (!users.contains(user)) {
@@ -204,6 +220,10 @@ public class UserDAO {
 		return userId;
 	}
 
+	/* (non-Javadoc)
+	 * @see bg.piggybank.model.user.IUserDAO#getCityId(java.lang.String)
+	 */
+	@Override
 	public int getCityId(String city) {
 		int id = 0;
 		try {
@@ -230,6 +250,10 @@ public class UserDAO {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see bg.piggybank.model.user.IUserDAO#getCountryId(java.lang.String)
+	 */
+	@Override
 	public int getCountryId(String country) {
 		int id = 0;
 		try {
@@ -257,6 +281,10 @@ public class UserDAO {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see bg.piggybank.model.user.IUserDAO#getCityByAddressID(int)
+	 */
+	@Override
 	public String getCityByAddressID(int addressId) {
 		String name = null;
 		try {
@@ -309,6 +337,10 @@ public class UserDAO {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see bg.piggybank.model.user.IUserDAO#getCountryByCityID(int)
+	 */
+	@Override
 	public String getCountryByCityID(int cityId) {
 		String name = null;
 		try {
@@ -336,6 +368,10 @@ public class UserDAO {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see bg.piggybank.model.user.IUserDAO#saveCity(java.sql.Connection, java.lang.String, int)
+	 */
+	@Override
 	public int saveCity(Connection connection, String city, int countryId) throws SQLException {
 		PreparedStatement statement = connection.prepareStatement(INSERT_INTO_CITIES, Statement.RETURN_GENERATED_KEYS);
 		statement.setString(1, city);
@@ -356,6 +392,10 @@ public class UserDAO {
 		return cityId;
 	}
 
+	/* (non-Javadoc)
+	 * @see bg.piggybank.model.user.IUserDAO#saveCountry(java.sql.Connection, java.lang.String)
+	 */
+	@Override
 	public int saveCountry(Connection connection, String country) throws SQLException {
 		PreparedStatement statement = connection.prepareStatement(INSERT_INTO_COUNTRIES,
 				Statement.RETURN_GENERATED_KEYS);
@@ -396,6 +436,10 @@ public class UserDAO {
 		return addressId;
 	}
 
+	/* (non-Javadoc)
+	 * @see bg.piggybank.model.user.IUserDAO#getUserByUsername(java.lang.String)
+	 */
+	@Override
 	public User getUserByUsername(String username) {
 		User user = null;
 		Connection connection = null;
@@ -443,6 +487,10 @@ public class UserDAO {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see bg.piggybank.model.user.IUserDAO#countOfUsers()
+	 */
+	@Override
 	public int countOfUsers() {
 		int allUsers = 0;
 		try {
@@ -462,6 +510,10 @@ public class UserDAO {
 		return allUsers;
 	}
 
+	/* (non-Javadoc)
+	 * @see bg.piggybank.model.user.IUserDAO#doesEmailExist(java.lang.String)
+	 */
+	@Override
 	public boolean doesEmailExist(String email) {
 		Connection connection = null;
 
@@ -485,6 +537,10 @@ public class UserDAO {
 
 	}
 
+	/* (non-Javadoc)
+	 * @see bg.piggybank.model.user.IUserDAO#generateNewPassword(java.lang.String)
+	 */
+	@Override
 	public String generateNewPassword(String email) {
 		Connection connection = null;
 		String password = null;
@@ -511,6 +567,10 @@ public class UserDAO {
 		return password;
 	}
 
+	/* (non-Javadoc)
+	 * @see bg.piggybank.model.user.IUserDAO#changePassword(java.lang.String, java.lang.String)
+	 */
+	@Override
 	public boolean changePassword(String username, String password) {
 		Connection connection = null;
 		if (Checkers.isStringValid(username) && Checkers.isStringValid(password)) {
@@ -544,6 +604,10 @@ public class UserDAO {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see bg.piggybank.model.user.IUserDAO#getCurrentUserInfo(java.lang.String)
+	 */
+	@Override
 	public Map<String, String> getCurrentUserInfo(String username) {
 		Map<String, String> userInfo = new HashMap<String, String>();
 		try {
@@ -580,6 +644,10 @@ public class UserDAO {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see bg.piggybank.model.user.IUserDAO#passwordCheck(int, java.lang.String)
+	 */
+	@Override
 	public boolean passwordCheck(int userId, String password){
 		Connection connection = null;
 		if (Checkers.isStringValid(password)) {
