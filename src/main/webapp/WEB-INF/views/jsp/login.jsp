@@ -1,5 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" session="false"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@page errorPage="error.jsp" %>
+
 <!-- === BEGIN HEADER === -->
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
@@ -104,8 +106,8 @@
 				<div class="col-md-12">
 					<div class="text-center visible-lg">
 						<ul id="hornavmenu" class="nav navbar-nav">
-							<li><a href="index.html" class="fa-home active">Начало</a></li>
-							<li><a href="contact.html" class="fa-comment ">Контакти</a></li>
+							<li><a href="index.html" class="fa-home active">НАЧАЛО</a></li>
+							<li><a href="contact.html" class="fa-comment ">КОНТАКТИ</a></li>
 						</ul>
 						<div style="font-size:20px;">Регистрирали се: <div class="success-message"><c:out value="${count}" /></div></div>
 					</div>

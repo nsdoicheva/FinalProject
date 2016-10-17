@@ -1,4 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" session="false"%>
+<%@page errorPage="error.jsp" %>
 
 <!DOCTYPE html>
 
@@ -265,8 +266,8 @@ window.onclick = function(event) {
 					<div class="headline">
 						<h2 class="margin-bottom-20">Форма за контакт</h2>
 					</div>
-					<p class="greetings">Използвайте формата ни за контакт, за да изпратите бързо и лесно своето съобщение.</p>
-					<p class="greetings">Обратната връзка е от голямо значение за нас, за да подобрим услугите, които предлагаме!</p>
+					<h6>Използвайте формата ни за контакт, за да изпратите бързо и лесно своето съобщение.</h6>
+					<h6>Обратната връзка е от голямо значение за нас, за да подобрим услугите, които предлагаме!</h6>
 					<br>
 					<!-- Contact Form -->
 

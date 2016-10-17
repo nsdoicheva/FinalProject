@@ -1,8 +1,8 @@
-<%@ page contentType="text/html; charset=UTF-8"%>
+<%@ page contentType="text/html; charset=UTF-8" session="false"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
-<%@page errorPage="error.jsp" %>
+<%@ page import="bg.piggybank.model.accounts.Account"%>
 
 <!-- === BEGIN HEADER === -->
 <!DOCTYPE html>
@@ -13,7 +13,7 @@
 <!--<![endif]-->
 <head>
 <!-- Title -->
-<title>PiggyBank Моите Карти</title>
+<title>PiggyBank Наличности</title>
 <!-- Meta -->
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <meta name="description" content="">
@@ -21,8 +21,8 @@
 <meta name="viewport"
 	content="width=device-width, initial-scale=1, maximum-scale=1" />
 <!-- Favicon -->
-<link href="favicon.ico" rel="shortcut icon">
-<link rel="icon" href="img/prase.png">
+
+<link rel="icon" src="assets/img/prase.png">
 <!-- Bootstrap Core CSS -->
 <link rel="stylesheet" href="css/bootstrap.css">
 <!-- Template CSS -->
@@ -36,13 +36,31 @@
 	type="text/css" rel="stylesheet">
 <link href="http://fonts.googleapis.com/css?family=Roboto:400,300"
 	type="text/css" rel="stylesheet">
+<script type="text/javascript">
+  window.onload = function () {
+     var chart = new CanvasJS.Chart("chartContainer",
+    {
+      title:{
+      text: "Наличности по месец"
+      },
+       data: [
+      {
+        type: "line",
+        dataPoints: [
+		<c:forEach var="amount" items="${myAmounts}"> 
+        { x: new Date(${amount.year}, ${amount.month}, ${amount.day}), y: ${amount.money}},
+        </c:forEach>
+        ]
+      }
+      ]
+    });
+    chart.render();
+  }
+  </script>
+<script type="text/javascript" src="js/canvasjs.min.js"></script>
 </head>
 <body>
-	<%
-		if (request.getSession(false) == null) {
-			response.sendRedirect("login");
-		}
-	%>
+
 	<!-- Header -->
 	<div id="header"
 		style="background-position: 50% 0%; <br />
@@ -106,49 +124,60 @@
 				<!-- Begin Sidebar Menu -->
 				<div class="col-md-3">
 					<ul class="list-group sidebar-nav" id="sidebar-nav">
-						<li class="list-group-item"><a href="myCards.html">Моите
-								карти</a></li>
-						<li class="list-group-item"><a href="makeCard.html">Нова
-								карта</a></li>
+						<li class="list-group-item"><a href="myAccounts.html">Моите
+								сметки</a></li>
+						<li class="list-group-item"><a href="makeAccount.html">Нова
+								сметка</a></li>
+						<li class="list-group-item"><a href="amounts.html">Наличности</a></li>
+						<li class="list-group-item"><a href="monthAmounts.html">Наличности
+								по месец</a></li>
 					</ul>
 				</div>
 				<!-- Main Text -->
-
 				<div class="col-md-9">
-					<h2 class="margin-bottom-30">Карти</h2>
+					<h2 class="margin-bottom-30">Наличности по месец</h2>
+					<div class="error-message">
+						<c:if test="${not empty errorMessage}">
+							<c:out value="${errorMessage}" />
+						</c:if>
+					</div>
 					<label>За сметка: </label>
 					<form method="POST">
 						<div class="row margin-bottom-20">
 							<div class="col-md-6 col-md-offset-0">
 								<select id="account" name="fromIban">
-									<option value="Всички">Всички</option>
 									<c:forEach var="account" items="${myAccounts}">
 										<option value="${account.getIBAN()}">${account.getIBAN()}</option>
 									</c:forEach>
+								</select> 
+								<select id="month" name="month">
+										<option value=0>Януари</option>
+										<option value=1>Февруари</option>
+										<option value=2>Март</option>
+										<option value=3>Април</option>
+										<option value=4>Май</option>
+										<option value=5>Юни</option>
+										<option value=6>Юли</option>
+										<option value=7>Август</option>
+										<option value=8>Септември</option>
+										<option value=9>Октомври</option>
+										<option value=10>Ноември</option>
+										<option value=11>Декември</option>
+								</select>
+								<select id="year" name="year">
+									<option value=2015>2015</option>
+									<option value=2016>2016</option>
 								</select>
 							</div>
 						</div>
 						<p>
 							<button type="submit" class="btn btn-primary">Изпрати</button>
-							<a href="#" class="error-message" onclick="HTMLtoPDF()">Свали на PDF</a>
+							
 						</p>
 					</form>
 					<div id="HTMLtoPDF">
-						<table>
-							<tr>
-								<th>Номер/Number</th>
-								<th>Тип/Type</th>
-								<th>Сметка/Account</th>
-							</tr>
-
-							<c:forEach items="${cards}" var="card">
-								<tr>
-									<td>${card.number}</td>
-									<td>${card.type}</td>
-									<td>${card.IBAN}</td>
-								</tr>
-							</c:forEach>
-						</table>
+						<div id="chartContainer" style="height: 300px; width: 100%;">
+						</div>
 					</div>
 				</div>
 				<!-- End Main Text -->
@@ -157,65 +186,56 @@
 	</div>
 	<!-- End Content -->
 	<!-- === BEGIN FOOTER === -->
-        <div id="base" class="background-dark text-light">
-            <div class="container padding-vert-30">
-                <div class="row">
-                    
-                </div>
-            </div>
-        </div>
-          <!-- Footer -->
-        <div id="footer" class="background-dark text-light">
-            <div class="container no-padding">
-                <div class="row">
-                    <!-- Footer Menu -->
-                    <div id="footermenu" class="col-md-8">
-                        <ul class="list-unstyled list-inline">
-                            <li>
-                                <a href="index.html">Начало</a>
-                            </li>
-                            <li>
-                                <a href="contactLogged.html">Контакти</a>
-                            </li>
-                           
-                        </ul>
-                    </div>
-                    <!-- End Footer Menu -->
-                    <!-- Copyright -->
-                    <div id="copyright" class="col-md-4">
-                        <p class="pull-right">(c) 2016 PiggyBank Online</p>
-                    </div>
-                    <!-- End Copyright -->
-                </div>
-            </div>
-            <!-- End Footer -->
+	<div id="base" class="background-dark text-light">
+		<div class="container padding-vert-30">
+			<div class="row"></div>
+		</div>
+	</div>
+	<!-- Footer -->
+	<div id="footer" class="background-dark text-light">
+		<div class="container no-padding">
+			<div class="row">
+				<!-- Footer Menu -->
+				<div id="footermenu" class="col-md-8">
+					<ul class="list-unstyled list-inline">
+						<li><a href="index.html">Начало</a></li>
+						<li><a href="contactLogged.html">Контакти</a></li>
 
+					</ul>
+				</div>
+				<!-- End Footer Menu -->
+				<!-- Copyright -->
+				<div id="copyright" class="col-md-4">
+					<p class="pull-right">(c) 2016 PiggyBank Online</p>
+				</div>
+				<!-- End Copyright -->
+			</div>
+		</div>
+		<!-- End Footer -->
 
-	<script type="text/javascript" src="js/jquery.min.js"></script>
-	<script type="text/javascript" src="js/bootstrap.min.js"></script>
-	<script type="text/javascript" src="js/scripts.js"></script>
-	<!-- Isotope - Portfolio Sorting -->
-	<script type="text/javascript" src="js/jquery.isotope.js"></script>
-	<!-- Mobile Menu - Slicknav -->
-	<script type="text/javascript" src="js/jquery.slicknav.js"></script>
-	<!-- Animate on Scroll-->
-	<script type="text/javascript" src="js/jquery.visible.js"
-		charset="utf-8"></script>
-	<!-- Stellar Parallax -->
-	<script type="text/javascript" src="js/jquery.stellar.js"
-		charset="utf-8"></script>
-	<!-- Sticky Div -->
-	<script type="text/javascript" src="js/jquery.sticky.js"
-		charset="utf-8"></script>
-	<!-- Slimbox2-->
-	<script type="text/javascript" src="js/slimbox2.js" charset="utf-8"></script>
-	<!-- Modernizr -->
-	<script src="js/modernizr.custom.js" type="text/javascript"></script>
-	<!-- these js files are used for making PDF -->
-	<script src="js/jspdf.js"></script>
-	<script src="js/jquery-2.1.3.js"></script>
-	<script src="js/pdfFromHTML.js"></script>
-	<!-- End JS -->
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script type="text/javascript" src="js/bootstrap.min.js"></script>
+		<script type="text/javascript" src="js/scripts.js"></script>
+		<!-- Isotope - Portfolio Sorting -->
+		<script type="text/javascript" src="js/jquery.isotope.js"></script>
+		<!-- Mobile Menu - Slicknav -->
+		<script type="text/javascript" src="js/jquery.slicknav.js"></script>
+		<!-- Animate on Scroll-->
+		<script type="text/javascript" src="js/jquery.visible.js"
+			charset="utf-8"></script>
+		<!-- Stellar Parallax -->
+		<script type="text/javascript" src="js/jquery.stellar.js"
+			charset="utf-8"></script>
+		<!-- Sticky Div -->
+		<script type="text/javascript" src="js/jquery.sticky.js"
+			charset="utf-8"></script>
+		<!-- Slimbox2-->
+		<script type="text/javascript" src="js/slimbox2.js" charset="utf-8"></script>
+		<!-- Modernizr -->
+		<script src="js/modernizr.custom.js" type="text/javascript"></script>
+		
+		<!-- End JS -->
 </body>
 </html>
 <!-- === END FOOTER === -->
+

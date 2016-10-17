@@ -1,4 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" session="false"%>
+<%@page errorPage="error.jsp" %>
 
 <!DOCTYPE html>
 
@@ -247,7 +248,7 @@ window.onclick = function(event) {
 				<div class="col-md-12">
 					<div class="text-center visible-lg">
 						<ul id="hornavmenu" class="nav navbar-nav">
-							<li><a href="index.html" class="fa-home active">НАЧАО</a></li>
+							<li><a href="index.html" class="fa-home active">НАЧАЛО</a></li>
 							<li><span class="fa-gears ">ПРОФИЛ</span>
 								<ul>
 									<li><a href="personalInfo.html">Лична информация</a></li>
@@ -270,6 +271,7 @@ window.onclick = function(event) {
 									<li><a href="myAccounts.html">Моите сметки</a></li>
 									<li><a href="makeAccount.html">Направи нова сметка</a></li>
 									<li><a href="amounts.html">Наличности</a></li>
+									<li><a href="monthAmounts.html">Наличности по месец</a></li>
 								</ul></li>
 							<li><a href="contactLogged.html" class="fa-comment ">КОНТАКТИ</a>
 							</li>
@@ -292,8 +294,8 @@ window.onclick = function(event) {
 					<div class="headline">
 						<h2 class="margin-bottom-20">Форма за контакт</h2>
 					</div>
-					<p class="greetings">Използвайте формата ни за контакт, за да изпратите бързо и лесно своето съобщение.</p>
-					<p class="greetings">Обратната връзка е от голямо значение за нас, за да подобрим услугите, които предлагаме!</p>
+					<h6>Използвайте формата ни за контакт, за да изпратите бързо и лесно своето съобщение.</h6>
+					<h6>Обратната връзка е от голямо значение за нас, за да подобрим услугите, които предлагаме!</h6>
 					<br>
 					<!-- Contact Form -->
 

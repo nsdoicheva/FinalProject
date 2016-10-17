@@ -1,6 +1,8 @@
 <%@page import="bg.piggybank.model.user.UserDAO"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ page contentType="text/html; charset=UTF-8" session="false" %>
+<%@page errorPage="error.jsp" %>
+
 <!DOCTYPE html>
 
 <html lang="en">
@@ -76,7 +78,7 @@ function validateForm()
                                     <a href="index.html" class="fa-home ">НАЧАЛО</a>
                                 </li>
                                 <li>
-                                    <a href="contact.jsp" class="fa-comment">КОНТАКТИ</a>
+                                    <a href="contact.html" class="fa-comment">КОНТАКТИ</a>
                                 </li>
                             </ul>
                         </div>
@@ -159,7 +161,7 @@ function validateForm()
                             <div class="row margin-bottom-20">
                               <div class="col-md-6 col-md-offset-0">
                               
-                                    <input name="country" class="form-control" type="text" required="required" placeholder="Държава">
+                                    <input name="country" class="form-control" type="text" required="required" placeholder="Държава" data-suggestions="Bulgaria, Greece, England, България, Гърция, Англия">
                                    
                                 </div>
                             </div>

@@ -1,6 +1,10 @@
 <%@ page contentType="text/html; charset=UTF-8" session="false"%>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@page errorPage="error.jsp" %>
 
+<!-- === BEGIN HEADER === -->
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
 <!--[if IE 9]> <html lang="en" class="ie9"> <![endif]-->
@@ -9,7 +13,7 @@
 <!--<![endif]-->
 <head>
 <!-- Title -->
-<title>PiggyBank Забравена парола</title>
+<title>PiggyBank Наличности</title>
 <!-- Meta -->
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <meta name="description" content="">
@@ -17,8 +21,8 @@
 <meta name="viewport"
 	content="width=device-width, initial-scale=1, maximum-scale=1" />
 <!-- Favicon -->
-<link href="favicon.ico" rel="shortcut icon">
-<link rel="icon" href="img/prase.png">
+
+<link rel="icon" src="assets/img/prase.png">
 <!-- Bootstrap Core CSS -->
 <link rel="stylesheet" href="css/bootstrap.css">
 <!-- Template CSS -->
@@ -34,6 +38,7 @@
 	type="text/css" rel="stylesheet">
 </head>
 <body>
+
 	<!-- Header -->
 	<div id="header"
 		style="background-position: 50% 0%; <br />
@@ -44,9 +49,8 @@
 			<div class="row">
 				<!-- Logo -->
 				<div class="logo">
-					<a href="index.html" title=""> <img src="img/logo_bank.png"
-						alt="Logo" />
-					</a>
+					<a href="index.html" title=""><img src="img/logo_bank.png"
+						alt="Logo" /></a>
 				</div>
 				<!-- End Logo -->
 			</div>
@@ -55,8 +59,33 @@
 				<div class="col-md-12">
 					<div class="text-center visible-lg">
 						<ul id="hornavmenu" class="nav navbar-nav">
-							<li><a href="index.html" class="fa-home ">НАЧАЛО</a></li>
-							<li><a href="contact.html" class="fa-comment active">КОНТАКТИ</a>
+							<li><a href="index.html" class="fa-home active">НАЧАЛО</a></li>
+							<li><span class="fa-gears ">ПРОФИЛ</span>
+								<ul>
+									<li><a href="personalInfo.html">Лична информация</a></li>
+									<li><a href="changePassword.html">Смяна на паролата</a></li>
+									<li><a href="toDoList.html">ToDo лист</a></li>
+									<li><a href="logout.html">Изход</a></li>
+								</ul></li>
+							<li><span class="fa-copy ">ТРАНСАКЦИИ</span>
+								<ul>
+									<li><a href="transactions.html">Моите трансакции</a></li>
+									<li><a href="makeTransaction.html">Нова трансакция</a></li>
+								</ul></li>
+							<li><span class="fa-th ">КАРТИ</span>
+								<ul>
+									<li><a href="myCards.html">Моите карти</a></li>
+									<li><a href="makeCard.html">Направи нова карта</a></li>
+								</ul></li>
+							<li><span class="fa-font ">СМЕТКИ</span>
+								<ul>
+									<li><a href="myAccounts.html">Моите сметки</a></li>
+									<li><a href="makeAccount.html">Направи нова сметка</a></li>
+									<li><a href="amounts.html">Наличности</a></li>
+						<li><a href="monthAmounts.html">Наличности по месец</a>
+						</li>
+								</ul></li>
+							<li><a href="contactLogged.html" class="fa-comment ">КОНТАКТИ</a>
 							</li>
 						</ul>
 					</div>
@@ -70,76 +99,69 @@
 	<!-- === BEGIN CONTENT === -->
 	<div id="content">
 		<div class="container background-white">
-			<div class="row margin-vert-30">
-				<!-- Main Column -->
+			<div class="row margin-vert-40">
+				<!-- Begin Sidebar Menu -->
+				<div class="col-md-3">
+					<ul class="list-group sidebar-nav" id="sidebar-nav">
+						<li class="list-group-item"><a href="myAccounts.html">Моите
+								сметки</a></li>
+						<li class="list-group-item"><a href="makeAccount.html">Нова
+								сметка</a></li>
+						<li class="list-group-item"><a href="amounts.html">Наличности</a>
+						</li>
+						<li class="list-group-item"><a href="monthAmounts.html">Наличности по месец</a>
+						</li>
+					</ul>
+				</div>
+				<!-- Main Text -->
 				<div class="col-md-9">
-					<!-- Main Content -->
-					<div class="headline">
-						<h2 class="margin-bottom-20">Възстановяване на паролата</h2>
+					<h2 class="margin-bottom-30">Наличности по месец</h2>
+					<div class="error-message">
+						<c:if test="${not empty errorMessage}">
+							<c:out value="${errorMessage}" />
+						</c:if>
 					</div>
-					<p>Въведете имейла, с който сте се регистрирали, за да получите
-						нова парола.</p>
-					<br>
-					<!-- Contact Form -->
+					<label>За сметка: </label>
 					<form method="POST">
-						<label>Email <span class="color-red">*</span>
-						</label>
 						<div class="row margin-bottom-20">
 							<div class="col-md-6 col-md-offset-0">
-								<input class="form-control" name="email" type="email" required="required">
+								<select id="account" name="fromIban">
+									<c:forEach var="account" items="${myAccounts}">
+										<option value="${account.getIBAN()}">${account.getIBAN()}</option>
+									</c:forEach>
+								</select>
+								
+								<select id="month" name="month">
+										<option value=0>Януари</option>
+										<option value=1>Февруари</option>
+										<option value=2>Март</option>
+										<option value=3>Април</option>
+										<option value=4>Май</option>
+										<option value=5>Юни</option>
+										<option value=6>Юли</option>
+										<option value=7>Август</option>
+										<option value=8>Септември</option>
+										<option value=9>Октомври</option>
+										<option value=10>Ноември</option>
+										<option value=11>Декември</option>
+								</select>
+								<select id="year" name="year">
+										<option value=2015>2015</option>
+										<option value=2016>2016</option>
+								</select>
 							</div>
 						</div>
 						<p>
-							<button type="submit" class="btn btn-primary">Възстанови</button>
+							<button type="submit" class="btn btn-primary">Изпрати</button>
 						</p>
 					</form>
-					<!-- End Contact Form -->
-					<!-- End Main Content -->
 				</div>
-				<!-- End Main Column -->
-				<!-- Side Column -->
-				<div class="col-md-3">
-					<!-- Recent Posts -->
-					<div class="panel panel-default">
-						<div class="panel-heading">
-							<h3 class="panel-title">Контакти</h3>
-						</div>
-						<div class="panel-body">
-							<ul class="list-unstyled">
-								<li><i class="fa-phone color-primary"></i>+359-894-312-388</li>
-								<li><i class="fa-envelope color-primary"></i>info@piggybank.bg</li>
-								<li><i class="fa-home color-primary"></i>http://www.piggybank.bg</li>
-							</ul>
-							<ul class="list-unstyled">
-								<li><strong class="color-primary">Понеделник-Петък:</strong>от
-									9 до 18 часа</li>
-								<li><strong class="color-primary">Събота:</strong>от 10 до
-									15 часа</li>
-								<li><strong class="color-primary">Неделя:</strong>почивен
-									ден</li>
-							</ul>
-						</div>
-					</div>
-					<!-- End recent Posts -->
-					<!-- About -->
-					<div class="panel panel-default">
-						<div class="panel-heading">
-							<h3 class="panel-title">За нас</h3>
-						</div>
-						<div class="panel-body">PiggyBank - банкирай както и когато
-							ти е удобно! Онлайн или чрез твоя смартфон - управлавай парите си
-							по начина, който желаеш. Имаш бърз и сигурен достъп до твоите
-							сметки и дори много повече! Превеждай парите между сметките си за
-							секунди!</div>
-					</div>
-					<!-- End About -->
-				</div>
-				<!-- End Side Column -->
+				<!-- End Main Text -->
 			</div>
 		</div>
 	</div>
-	<!-- === END CONTENT === -->
-	<!-- === BEGIN FOOTER === -->
+	<!-- End Content -->
+<!-- === BEGIN FOOTER === -->
         <div id="base" class="background-dark text-light">
             <div class="container padding-vert-30">
                 <div class="row">
@@ -172,7 +194,7 @@
                 </div>
             </div>
             <!-- End Footer -->
-	<!-- JS -->
+
 	<script type="text/javascript" src="js/jquery.min.js"></script>
 	<script type="text/javascript" src="js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="js/scripts.js"></script>

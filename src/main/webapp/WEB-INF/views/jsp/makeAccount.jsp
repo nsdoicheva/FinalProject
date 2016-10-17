@@ -2,6 +2,8 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@page errorPage="error.jsp" %>
+
 <!-- === BEGIN HEADER === -->
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
@@ -62,7 +64,7 @@
 				<div class="col-md-12">
 					<div class="text-center visible-lg">
 						<ul id="hornavmenu" class="nav navbar-nav">
-							<li><a href="index.html" class="fa-home active">НАЧАО</a></li>
+							<li><a href="index.html" class="fa-home active">НАЧАЛО</a></li>
 							<li><span class="fa-gears ">ПРОФИЛ</span>
 								<ul>
 									<li><a href="personalInfo.html">Лична информация</a></li>
@@ -85,6 +87,7 @@
 									<li><a href="myAccounts.html">Моите сметки</a></li>
 									<li><a href="makeAccount.html">Направи нова сметка</a></li>
 									<li><a href="amounts.html">Наличности</a></li>
+									<li><a href="monthAmounts.html">Наличности по месец</a></li>
 								</ul></li>
 							<li><a href="contactLogged.html" class="fa-comment ">КОНТАКТИ</a>
 							</li>
@@ -109,6 +112,8 @@
 						<li class="list-group-item"><a href="makeAccount.html">Нова
 								сметка</a></li>
 						<li class="list-group-item"><a href="amounts.html">Наличности</a></li>
+						<li class="list-group-item"><a href="monthAmounts.html">Наличности
+								по месец</a></li>
 					</ul>
 				</div>
 				<!-- Main Text -->
@@ -124,7 +129,9 @@
 						<div class="row margin-bottom-20">
 							<div class="col-md-6 col-md-offset-0">
 								<input class="form-control" type="text" name="name"
-									required="required">
+									required="required" data-validation="custom"
+                                       data-validation-regexp="^([a-zA-Zа-яА-Я-0-9\s]*)$"
+									data-validation-length="min3">
 							</div>
 						</div>
 						<label>Тип: </label>
@@ -213,6 +220,11 @@
 		<script type="text/javascript" src="js/slimbox2.js" charset="utf-8"></script>
 		<!-- Modernizr -->
 		<script src="js/modernizr.custom.js" type="text/javascript"></script>
+		<script
+			src="https://cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.3.26/jquery.form-validator.min.js"></script>
+		<script>
+			$.validate();
+		</script>
 		<!-- End JS -->
 </body>
 </html>

@@ -1,5 +1,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ page contentType="text/html; charset=UTF-8" session="false"%>
+<%@page errorPage="error.jsp" %>
+
 <!DOCTYPE html>
 
 <html lang="en">
@@ -76,7 +78,7 @@
 				<div class="col-md-12">
 					<div class="text-center visible-lg">
 						<ul id="hornavmenu" class="nav navbar-nav">
-							<li><a href="index.html" class="fa-home active">НАЧАО</a></li>
+							<li><a href="index.html" class="fa-home active">НАЧАЛО</a></li>
 							<li><span class="fa-gears ">ПРОФИЛ</span>
 								<ul>
 									<li><a href="personalInfo.html">Лична информация</a></li>
@@ -99,6 +101,7 @@
 									<li><a href="myAccounts.html">Моите сметки</a></li>
 									<li><a href="makeAccount.html">Направи нова сметка</a></li>
 									<li><a href="amounts.html">Наличности</a></li>
+									<li><a href="monthAmounts.html">Наличности по месец</a></li>
 								</ul></li>
 							<li><a href="contactLogged.html" class="fa-comment ">КОНТАКТИ</a>
 							</li>
