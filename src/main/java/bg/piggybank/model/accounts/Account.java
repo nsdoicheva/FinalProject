@@ -19,6 +19,12 @@ import bg.piggybank.model.configurations.Config;
 
 @ContextConfiguration(classes= Config.class)
 public class Account extends BasicInfo {
+	private static final String ACCOUNT_TYPE_NUMBER = "20";
+	private static final String BRANCH_CODE = "4545";
+	private static final String BANK_CODE = "BNBG";
+	private static final int IBAN_START_NUMBER = 11000064;
+	private static final String CRYPT_KEY = "Bar12345Bar12345";
+	private static final String IBAN_REGEX = "^[DE]{2}([0-9a-zA-Z]{20})$";
 	private int id;
 	private String name;
 	private String IBAN;
@@ -72,7 +78,7 @@ public class Account extends BasicInfo {
 	}
 
 	public boolean isValidIBAN(String IBAN) {
-		String ibanPattern = "^[DE]{2}([0-9a-zA-Z]{20})$";
+		String ibanPattern = IBAN_REGEX;
 		java.util.regex.Pattern p = java.util.regex.Pattern.compile(ibanPattern);
 		java.util.regex.Matcher m = p.matcher(IBAN);
 		return m.matches();
@@ -98,7 +104,7 @@ public class Account extends BasicInfo {
 		// Create key and cipher
 		String enc = null;
 		try {
-			String key = "Bar12345Bar12345";
+			String key = CRYPT_KEY;
 			Key aesKey = new SecretKeySpec(key.getBytes(), "AES");
 			Cipher cipher = Cipher.getInstance("AES");
 			// encrypt the text
@@ -123,20 +129,11 @@ public class Account extends BasicInfo {
 		// Create key and cipher
 		String decrypted = null;
 		try {
-			String key = "Bar12345Bar12345"; // 128 bit key
+			String key = CRYPT_KEY; // 128 bit key
 			// Create key and cipher
 			Key aesKey = new SecretKeySpec(key.getBytes(), "AES");
 			Cipher cipher = Cipher.getInstance("AES");
-			// encrypt the text
-			//cipher.init(Cipher.ENCRYPT_MODE, aesKey);
-			//byte[] encrypted = cipher.doFinal(iban.getBytes());
-
-			/*StringBuilder sb = new StringBuilder();
-			for (byte b : encrypted) {
-				sb.append((char) b);
-			}*/
-			// the encrypted String
-			//String enc = sb.toString();
+			
 			String enc= iban;
 			// now convert the string to byte array
 			// for decryption
@@ -158,10 +155,10 @@ public class Account extends BasicInfo {
 	
 	void setIBAN(){
 		Integer numberOfAccounts=  AccountDAO.getNumberOfAccounts();
-		Integer number= 11000064 + numberOfAccounts ;
+		Integer number= IBAN_START_NUMBER + numberOfAccounts ;
 		System.out.println(number);
 		String accountNumber= number.toString();
-		Iban iban= new Iban.Builder().countryCode(CountryCode.BG).bankCode("BNBG").branchCode("4545").accountType("20").accountNumber(accountNumber).build() ;
+		Iban iban= new Iban.Builder().countryCode(CountryCode.BG).bankCode(BANK_CODE).branchCode(BRANCH_CODE).accountType(ACCOUNT_TYPE_NUMBER).accountNumber(accountNumber).build() ;
 		this.IBAN = iban.toString();
 	}
 	

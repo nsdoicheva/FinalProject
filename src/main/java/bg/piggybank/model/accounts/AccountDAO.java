@@ -19,10 +19,10 @@ import org.springframework.stereotype.Component;
 import bg.piggybank.model.user.*;
 
 @Component
-public class AccountDAO {
+public class AccountDAO implements IAccountDAO {
 
 	@Autowired
-	private UserDAO userDao;
+	private IUserDAO userDao;
 	private static final String REGISTER_REQUEST = "INSERT INTO accounts(id, name, sum, iban, date, users_id, currencies_type, accountTypes_id) VALUES(null, ?, ?, ?, ?, ?, ?, ?);";
 	private static final String GET_CURRENCY_ID = "SELECT type FROM currencies WHERE type  LIKE (?)";
 	private static final String GET_ACCOUNT_ID = "SELECT id from accounttypes WHERE name LIKE (?)";
@@ -35,6 +35,10 @@ public class AccountDAO {
 	private static final String SELECT_ALL_ACCOUNTS = "SELECT id FROM accounts;";
 	private static final String SELECT_ACCOUNT_ID_BY_USER_ID = "SELECT id FROM accounts WHERE users_id = ?;";
 
+	/* (non-Javadoc)
+	 * @see bg.piggybank.model.accounts.IAccount#registrateUserAccount(bg.piggybank.model.user.User, bg.piggybank.model.accounts.Account)
+	 */
+	@Override
 	public int registrateUserAccount(User user, Account account)
 			throws UserInfoException, AccountException, InvalidAccountInfoException, InvalidAccountException {
 		if (user == null) {
@@ -97,6 +101,10 @@ public class AccountDAO {
 		return numberOfMark;
 	}
 
+	/* (non-Javadoc)
+	 * @see bg.piggybank.model.accounts.IAccount#getAllMyAccounts(java.lang.String)
+	 */
+	@Override
 	public List<Account> getAllMyAccounts(String username) {
 		List<Account> list = new ArrayList<Account>();
 		if (username == null || username.trim().equals("")) {
@@ -155,6 +163,10 @@ public class AccountDAO {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see bg.piggybank.model.accounts.IAccount#getAccountByIBAN(java.lang.String)
+	 */
+	@Override
 	public Account getAccountByIBAN(String IBAN) {
 		Connection connection = null;
 		Account account = null;
@@ -201,6 +213,10 @@ public class AccountDAO {
 
 	}
 
+	/* (non-Javadoc)
+	 * @see bg.piggybank.model.accounts.IAccount#getCurrencyType(java.lang.String)
+	 */
+	@Override
 	public CurrencyType getCurrencyType(String currency) {
 		CurrencyType currType = null;
 		CurrencyType[] currencies = CurrencyType.values();
@@ -212,6 +228,10 @@ public class AccountDAO {
 		return currType;
 	}
 
+	/* (non-Javadoc)
+	 * @see bg.piggybank.model.accounts.IAccount#getAccountTypeByID(java.sql.Connection, int)
+	 */
+	@Override
 	public AccountType getAccountTypeByID(Connection connection, int typeID) throws SQLException {
 		PreparedStatement statement = connection.prepareStatement(SELECT_ACCOUNT_TYPE_BY_ID);
 		statement.setInt(1, typeID);
@@ -223,6 +243,10 @@ public class AccountDAO {
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see bg.piggybank.model.accounts.IAccount#getAccountType(java.lang.String)
+	 */
+	@Override
 	public AccountType getAccountType(String type) {
 		AccountType[] types = AccountType.values();
 		for (int index = 0; index < types.length; index++) {
@@ -233,6 +257,10 @@ public class AccountDAO {
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see bg.piggybank.model.accounts.IAccount#getAllCurrencies()
+	 */
+	@Override
 	public List<String> getAllCurrencies() {
 		List<String> currencies = new ArrayList<String>();
 		for (CurrencyType type : CurrencyType.values()) {
@@ -241,6 +269,10 @@ public class AccountDAO {
 		return currencies;
 	}
 
+	/* (non-Javadoc)
+	 * @see bg.piggybank.model.accounts.IAccount#getAllAccountTypes()
+	 */
+	@Override
 	public List<String> getAllAccountTypes() {
 		List<String> accounts = new ArrayList<String>();
 		for (AccountType type : AccountType.values()) {
@@ -249,6 +281,10 @@ public class AccountDAO {
 		return accounts;
 	}
 
+	/* (non-Javadoc)
+	 * @see bg.piggybank.model.accounts.IAccount#getAccountByID(int, java.sql.Connection)
+	 */
+	@Override
 	public Account getAccountByID(int accountId, Connection connection) {
 		Account account = null;
 		try {
@@ -276,6 +312,10 @@ public class AccountDAO {
 
 	}
 
+	/* (non-Javadoc)
+	 * @see bg.piggybank.model.accounts.IAccount#getAccountIDByIBAN(java.lang.String)
+	 */
+	@Override
 	public int getAccountIDByIBAN(String IBAN) {
 		Connection connection;
 		int id = 0;
@@ -296,6 +336,10 @@ public class AccountDAO {
 		return id;
 	}
 
+	/* (non-Javadoc)
+	 * @see bg.piggybank.model.accounts.IAccount#getAllAccounts()
+	 */
+	@Override
 	public List<Integer> getAllAccounts() {
 		List<Integer> list = new ArrayList<Integer>();
 		Connection connection;
@@ -314,6 +358,10 @@ public class AccountDAO {
 		return list;
 	}
 	
+	/* (non-Javadoc)
+	 * @see bg.piggybank.model.accounts.IAccount#getAccountIDByUserID(int)
+	 */
+	@Override
 	public List<Integer> getAccountIDByUserID(int userID){
 		List<Integer> accounts= new ArrayList<Integer>();
 		Connection connection;
