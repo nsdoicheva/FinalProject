@@ -9,6 +9,10 @@ public class Amount {
 	private Timestamp date;
 	private double money;
 	private String IBAN;
+	private int month;
+
+	private int day;
+	private int year;
 
 	public Amount(int id, Timestamp date, double money, String IBAN) {
 		try {
@@ -27,7 +31,7 @@ public class Amount {
 			} else {
 				throw new AmountException("Invalid amount money");
 			}
-			if (IBAN!= null && !IBAN.trim().equals("")) {
+			if (IBAN != null && !IBAN.trim().equals("")) {
 				this.IBAN = IBAN;
 			} else {
 				throw new AmountException("Invalid amount IBAN");
@@ -48,9 +52,38 @@ public class Amount {
 	public double getMoney() {
 		return money;
 	}
-	
+
 	public String getIBAN() {
 		return IBAN;
 	}
 
+	public int getMonth() {
+		return month;
+	}
+
+	public void setMonth(int month) {
+		if (month >= 0) {
+			this.month = month;
+		}
+	}
+
+	public int getDay() {
+		return day;
+	}
+
+	public void setDay(int day) {
+		if (day > 0) {
+			this.day = day;
+		}
+	}
+
+	public int getYear() {
+		return year;
+	}
+
+	public void setYear(int year) {
+		if (year > 0) {
+			this.year = year;
+		}
+	}
 }
