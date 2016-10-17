@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -15,19 +16,19 @@ import org.springframework.stereotype.Component;
 
 import bg.piggybank.model.DBConnection;
 import bg.piggybank.model.accounts.Account;
-import bg.piggybank.model.accounts.AccountDAO;
+import bg.piggybank.model.accounts.IAccountDAO;
 import bg.piggybank.model.exeptions.FailedConnectionException;
 import bg.piggybank.model.exeptions.InvalidTransactionInfoException;
 import bg.piggybank.model.exeptions.NotEnoughMoneyException;
 
 @Component
-public class TransactionDAO {
+public class TransactionDAO implements ITransactionDAO {
 	@Autowired
-	private AccountDAO accountDao;
+	private IAccountDAO accountDao;
 	private final static String SELECT_ALL_TRANSACTIONS = "SELECT t.sum , u.username as sender, us.username as receiver, t.description "
 			+ "FROM transactions t join accounts a on t.fromAccount_id = a.id join accounts ac on t.toAccount_id = ac.id "
 			+ "JOIN users u ON u.id=a.users_id JOIN users us ON us.id=ac.users_id ; ";
-        private static final String UPDATE_ACCOUNTS_SUM = "UPDATE accounts SET sum = ? where id = ?;";      
+
 	private final static String SELECT_ALL_USER_TRANSACTIONS = "SELECT t.sum , u.username as sender, us.username as receiver, t.description, t.fromAccount_id, t.toAccount_id "
 			+ "FROM transactions t join accounts a on t.fromAccount_id = a.id join accounts ac on t.toAccount_id = ac.id "
 			+ "JOIN users u ON u.id=a.users_id JOIN users us ON us.id=ac.users_id WHERE u.username= ? OR us.username=?; ";
@@ -36,9 +37,14 @@ public class TransactionDAO {
 			+ "JOIN users u ON u.id=a.users_id JOIN users us ON us.id=ac.users_id WHERE t.fromAccount_id =? OR t.toAccount_id=?; ";
 	private final static String INSERT_TRANSACTION = "INSERT INTO transactions VALUES (null, ?, ?, ?, ?, ?);";
 	private final static String SELECT_ACCOUNT_ID = "select id from accounts where IBAN = ? ;";
+	private static final String UPDATE_ACCOUNTS_SET_SUM = "UPDATE accounts SET sum = ? where id = ?;";
 
 	private static List<Transaction> transactions = Collections.synchronizedList(new ArrayList<Transaction>());
 
+	/* (non-Javadoc)
+	 * @see bg.piggybank.model.transactions.ITransactionDAO#getAccountID(java.lang.String, java.sql.Connection)
+	 */
+	@Override
 	public int getAccountID(String iban, Connection connection) throws SQLException {
 		PreparedStatement ps = connection.prepareStatement(SELECT_ACCOUNT_ID);
 		String ibanche = Account.cryptIban(iban);
@@ -50,6 +56,10 @@ public class TransactionDAO {
 		return accountID;
 	}
 
+	/* (non-Javadoc)
+	 * @see bg.piggybank.model.transactions.ITransactionDAO#saveTransaction(bg.piggybank.model.accounts.Account, bg.piggybank.model.accounts.Account, double, java.lang.String)
+	 */
+	@Override
 	public boolean saveTransaction(Account from, Account to, double sum, String description)
 			throws InvalidTransactionInfoException, NotEnoughMoneyException {
 		Connection connection = null;
@@ -63,7 +73,7 @@ public class TransactionDAO {
 				PreparedStatement statement = DBConnection.getInstance().getConnection()
 						.prepareStatement(INSERT_TRANSACTION, Statement.RETURN_GENERATED_KEYS);
 				long timeNow = Calendar.getInstance().getTimeInMillis();
-				Timestamp date = Timestamp(timeNow);
+				Timestamp date = new Timestamp(timeNow);
 
 				statement.setTimestamp(1, date);
 				statement.setDouble(2, sum);
@@ -77,13 +87,13 @@ public class TransactionDAO {
 				newSumFrom = from.decreaseAmount(sum);
 				double newSumTo = to.increaseAmount(sum);
 				PreparedStatement updateStatement = connection
-						.prepareStatement(UPDATE_ACCOUNTS_SUM);
+						.prepareStatement(UPDATE_ACCOUNTS_SET_SUM);
 				updateStatement.setDouble(1, newSumFrom);
 				updateStatement.setInt(2, fromAccountID);
 				updateStatement.executeUpdate();
 
 				PreparedStatement updateStatement2 = connection
-						.prepareStatement(UPDATE_ACCOUNTS_SUM);
+						.prepareStatement(UPDATE_ACCOUNTS_SET_SUM);
 				updateStatement2.setDouble(1, newSumTo);
 				updateStatement2.setInt(2, toAccountID);
 				updateStatement2.executeUpdate();
@@ -103,7 +113,7 @@ public class TransactionDAO {
 			try {
 				connection.rollback();
 			} catch (SQLException e1) {
-				e1.printStackTrace();
+				e.printStackTrace();
 			}
 
 		} finally {
@@ -116,6 +126,10 @@ public class TransactionDAO {
 		return false;
 	}
 
+	/* (non-Javadoc)
+	 * @see bg.piggybank.model.transactions.ITransactionDAO#listAllTransactions()
+	 */
+	@Override
 	public List<Transaction> listAllTransactions() {
 		try {
 			Statement statement = DBConnection.getInstance().getConnection().createStatement();
@@ -136,6 +150,10 @@ public class TransactionDAO {
 		return transactions;
 	}
 
+	/* (non-Javadoc)
+	 * @see bg.piggybank.model.transactions.ITransactionDAO#listAllMyTransacions(java.lang.String)
+	 */
+	@Override
 	public List<Transaction> listAllMyTransacions(String username) {
 		List<Transaction> myTransactions = new ArrayList<Transaction>();
 		try {
@@ -166,6 +184,10 @@ public class TransactionDAO {
 
 	}
 
+	/* (non-Javadoc)
+	 * @see bg.piggybank.model.transactions.ITransactionDAO#isValidTransaction(bg.piggybank.model.accounts.Account, bg.piggybank.model.accounts.Account)
+	 */
+	@Override
 	public boolean isValidTransaction(Account from, Account to) {
 		System.out.println(from.getCurrency().toString());
 		System.out.println(to.getCurrency().toString());
@@ -176,6 +198,10 @@ public class TransactionDAO {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see bg.piggybank.model.transactions.ITransactionDAO#listAllTransactionsForAccount(java.lang.String)
+	 */
+	@Override
 	public List<Transaction> listAllTransactionsForAccount(String IBAN) {
 		Account account = accountDao.getAccountByIBAN(IBAN);
 		List<Transaction> myTransactions = new ArrayList<Transaction>();
